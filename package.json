@@ -1,7 +1,7 @@
 {
-  "name": "gamejam-boilerplate",
-  "version": "1.2.0",
-  "description": "Boilerplate for Game Jams like JS13KGames",
+  "name": "mirr-0r",
+  "version": "1.0.0",
+  "description": "MIIR-0R for Gamedev.js jam 2021 on theme 'mirror'",
   "main": "src/js/game.js",
   "scripts": {
     "clean": "rm -rf dist && mkdir dist",
