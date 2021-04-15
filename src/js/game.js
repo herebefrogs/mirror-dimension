@@ -1,6 +1,5 @@
 import { isMobile } from './mobile';
 import { checkMonetization } from './monetization';
-import { loadSongs, playSound, playSong } from './sound';
 import { initSpeech } from './speech';
 import { save, load } from './storage';
 import { ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, CHARSET_SIZE, initCharset, renderText } from './text';
