@@ -34,15 +34,15 @@ let speak;
 const CTX = c.getContext('2d');         // visible canvas
 const MAP = c.cloneNode();              // full map rendered off screen
 const MAP_CTX = MAP.getContext('2d');
-MAP.width = 640;                        // map size
-MAP.height = 480;
+MAP.width = 280;                        // map size
+MAP.height = 360;
 const VIEWPORT = c.cloneNode();           // visible portion of map/viewport
 const VIEWPORT_CTX = VIEWPORT.getContext('2d');
-VIEWPORT.width = 320;                      // viewport size
+VIEWPORT.width = 180;                      // viewport size
 VIEWPORT.height = 240;
 
 // camera-window & edge-snapping settings
-const CAMERA_WINDOW_X = 100;
+const CAMERA_WINDOW_X = 50;
 const CAMERA_WINDOW_Y = 50;
 const CAMERA_WINDOW_WIDTH = VIEWPORT.width - CAMERA_WINDOW_X;
 const CAMERA_WINDOW_HEIGHT = VIEWPORT.height - CAMERA_WINDOW_Y;
@@ -55,15 +55,20 @@ const ATLAS = {
       { x: 0, y: 0, w: 16, h: 16 },
       { x: 0, y: 16, w: 16, h: 16 }
     ],
-    speed: 100,
+    speed: 25,
   },
   flight: {
     move: [
       { x: 16, y: 0, w: 16, h: 16 },
       { x: 16, y: 16, w: 16, h: 16 }
     ],
-    speed: 100,
+    speed: 25,
   },
+  scroll: {
+    speed: {
+      y: 50 // px per sec
+    }
+  }
 };
 
 const FRAME_DURATION = 0.1; // duration of 1 animation frame, in seconds
@@ -85,12 +90,14 @@ function unlockExtraContent() {
 function startGame() {
   konamiIndex = 0;
   countdown = 60;
-  viewportOffsetX = viewportOffsetY = 0;
-  hero = createEntity('hero', VIEWPORT.width / 2, VIEWPORT.height / 2);
+  viewportOffsetX = (MAP.width - VIEWPORT.width) / 2;
+  viewportOffsetY = MAP.height - VIEWPORT.height;
+  // TODO the whole referentiel is off due to screen (0,0) being top left rather than bottom left
+  hero = createEntity('hero', MAP.width / 2, MAP.height - 3*ATLAS.hero.move[0].h);
   flight = [
     hero,
-    createEntity('flight', VIEWPORT.width / 2 - hero.w, VIEWPORT.height / 2 + hero.h),
-    createEntity('flight', VIEWPORT.width / 2 + hero.w, VIEWPORT.height / 2 + hero.h)
+    createEntity('flight', hero.x - hero.w, hero.y + hero.h),
+    createEntity('flight', hero.x + hero.w, hero.y + hero.h)
   ];
   entities = [
     ...flight
@@ -185,14 +192,21 @@ function correctAABBCollision(entity1, entity2, test) {
   }
 };
 
-function constrainToViewport(entity) {
+function constrainFlightToViewport(entity) {
+  // TODO
+  // left-most ship
   if (entity.x < 0) {
+    // adjust rest of flight if corrected
     entity.x = 0;
+    // right-most ship
   } else if (entity.x > MAP.width - entity.w) {
+    // adjust rest of flight if corrected
     entity.x = MAP.width - entity.w;
   }
+  // top-most ship
   if (entity.y < 0) {
     entity.y = 0;
+  // bottom most ship
   } else if (entity.y > MAP.height - entity.h) {
     entity.y = MAP.height - entity.h;
   }
@@ -200,6 +214,7 @@ function constrainToViewport(entity) {
 
 
 function updateCameraWindow() {
+  // TODO same as constrainFlightToViewport
   // edge snapping
   if (0 < viewportOffsetX && hero.x < viewportOffsetX + CAMERA_WINDOW_X) {
     viewportOffsetX = Math.max(0, hero.x - CAMERA_WINDOW_X);
@@ -262,7 +277,7 @@ function updateHeroInput() {
   });
 }
 
-function updateEntity(entity) {
+function updateEntityPositionAndAnimationFrame(entity) {
   // update animation frame
   entity.frameTime += elapsedTime;
   if (entity.frameTime > FRAME_DURATION) {
@@ -284,15 +299,28 @@ function update() {
       if (countdown < 0) {
         screen = END_SCREEN;
       }
+      // scrolling
+      const scrolledDistance = ATLAS.scroll.speed.y*elapsedTime;
+      flight.forEach(ship => ship.y -= scrolledDistance);
+      viewportOffsetY -= scrolledDistance;
+      // infinite scrolling
+      if (viewportOffsetY < 0) {
+        viewportOffsetY += MAP.height - VIEWPORT.height;
+        // TOOD remove hack
+        entities.forEach(entity => {
+          entity.y += MAP.height - VIEWPORT.height
+        });
+      }
       updateHeroInput();
-      entities.forEach(updateEntity);
+      entities.forEach(updateEntityPositionAndAnimationFrame);
+      // TODO update for flight
       entities.slice(1).forEach((entity) => {
         const test = testAABBCollision(hero, entity);
         if (test.collide) {
           correctAABBCollision(hero, entity, test);
         }
       });
-      constrainToViewport(hero);
+      constrainFlightToViewport(hero);
       updateCameraWindow();
       break;
   }
@@ -315,7 +343,7 @@ function render() {
 
   switch (screen) {
     case TITLE_SCREEN:
-      renderText('mirr-0r', VIEWPORT.width / 2, CHARSET_SIZE, ALIGN_CENTER, 5);
+      renderText('mirr-0r', VIEWPORT.width / 2, CHARSET_SIZE, ALIGN_CENTER, 2);
       renderText(isMobile ? 'tap to start' : 'press any key', VIEWPORT.width / 2, VIEWPORT.height / 2, ALIGN_CENTER);
       if (konamiIndex === konamiCode.length) {
         renderText('konami mode on', VIEWPORT.width - CHARSET_SIZE, CHARSET_SIZE, ALIGN_RIGHT);
@@ -363,9 +391,14 @@ function renderEntity(entity, ctx = VIEWPORT_CTX) {
 };
 
 function renderMap() {
-  MAP_CTX.fillStyle = '#000';
+  MAP_CTX.fillStyle = '#777';
   MAP_CTX.fillRect(0, 0, MAP.width, MAP.height);
-  // TODO cache map by rendering static entities on the MAP canvas
+  MAP_CTX.fillStyle ='#ccc';
+  [0, 1, 2].forEach(i => {
+    MAP_CTX.fillRect(0, i*120, 70, 60);
+    MAP_CTX.fillRect(210, i*120, 70, 60);
+    MAP_CTX.fillRect(70, (2*i+1)*60, 140, 60);
+  })
 };
 
 // LOOP HANDLERS
