@@ -23,7 +23,8 @@ const RADIUS_ONE_AT_45_DEG = Math.cos(Math.PI / 4);
 const TIME_TO_FULL_SPEED = 150;                // in millis, duration till going full speed in any direction
 
 let countdown; // in seconds
-let hero;
+let hero;      // player ship currently leading the flight
+let flight;    // all player ships part of the flight
 let entities;
 
 let speak;
@@ -51,21 +52,20 @@ let viewportOffsetY = 0;
 const ATLAS = {
   hero: {
     move: [
-      { x: 0, y: 0, w: 16, h: 18 },
-      { x: 16, y: 0, w: 16, h: 18 },
-      { x: 32, y: 0, w: 16, h: 18 },
-      { x: 48, y: 0, w: 16, h: 18 },
-      { x: 64, y: 0, w: 16, h: 18 },
+      { x: 0, y: 0, w: 16, h: 16 },
+      { x: 0, y: 16, w: 16, h: 16 }
     ],
     speed: 100,
   },
-  foe: {
-    'move': [
-      { x: 0, y: 0, w: 16, h: 18 },
+  flight: {
+    move: [
+      { x: 16, y: 0, w: 16, h: 16 },
+      { x: 16, y: 16, w: 16, h: 16 }
     ],
-    speed: 0,
+    speed: 100,
   },
 };
+
 const FRAME_DURATION = 0.1; // duration of 1 animation frame, in seconds
 let tileset;   // characters sprite, embedded as a base64 encoded dataurl by build script
 
@@ -88,19 +88,13 @@ function startGame() {
   countdown = 60;
   viewportOffsetX = viewportOffsetY = 0;
   hero = createEntity('hero', VIEWPORT.width / 2, VIEWPORT.height / 2);
-  entities = [
+  flight = [
     hero,
-    createEntity('foe', 10, 10),
-    createEntity('foe', 630 - 16, 10),
-    createEntity('foe', 630 - 16, 470 - 18),
-    createEntity('foe', 300, 200),
-    createEntity('foe', 400, 300),
-    createEntity('foe', 500, 400),
-    createEntity('foe', 10, 470 - 18),
-    createEntity('foe', 100, 100),
-    createEntity('foe', 100, 118),
-    createEntity('foe', 116, 118),
-    createEntity('foe', 116, 100),
+    createEntity('flight', VIEWPORT.width / 2 - hero.w, VIEWPORT.height / 2 + hero.h),
+    createEntity('flight', VIEWPORT.width / 2 + hero.w, VIEWPORT.height / 2 + hero.h)
+  ];
+  entities = [
+    ...flight
   ];
   renderMap();
   screen = GAME_SCREEN;
@@ -245,22 +239,28 @@ function createEntity(type, x = 0, y = 0) {
 };
 
 function updateHeroInput() {
-  // TODO can touch & desktop be handled the same way?
-  if (isTouch) {
-    hero.moveX = hero.moveLeft + hero.moveRight;
-    hero.moveY = hero.moveUp + hero.moveDown;
+  let moveX = 0;
+  let moveY = 0;
+  
+   if (isTouch) {
+    moveX = hero.moveLeft + hero.moveRight;
+    moveY = hero.moveUp + hero.moveDown;
   } else {
     if (hero.moveLeft || hero.moveRight) {
-      hero.moveX = (hero.moveLeft > hero.moveRight ? -1 : 1) * lerp(0, 1, (currentTime - Math.max(hero.moveLeft, hero.moveRight)) / TIME_TO_FULL_SPEED)
+      moveX = (hero.moveLeft > hero.moveRight ? -1 : 1) * lerp(0, 1, (currentTime - Math.max(hero.moveLeft, hero.moveRight)) / TIME_TO_FULL_SPEED)
     } else {
-      hero.moveX = 0;
+      moveX = 0;
     }
     if (hero.moveDown || hero.moveUp) {
-      hero.moveY = (hero.moveUp > hero.moveDown ? -1 : 1) * lerp(0, 1, (currentTime - Math.max(hero.moveUp, hero.moveDown)) / TIME_TO_FULL_SPEED)
+      moveY = (hero.moveUp > hero.moveDown ? -1 : 1) * lerp(0, 1, (currentTime - Math.max(hero.moveUp, hero.moveDown)) / TIME_TO_FULL_SPEED)
     } else {
-      hero.moveY = 0;
+      moveY = 0;
     }
   }
+  flight.forEach(ship => {
+    ship.moveX = moveX;
+    ship.moveY = moveY;
+  });
 }
 
 function updateEntity(entity) {
@@ -311,12 +311,12 @@ function blit() {
 };
 
 function render() {
-  VIEWPORT_CTX.fillStyle = '#fff';
+  VIEWPORT_CTX.fillStyle = '#000';
   VIEWPORT_CTX.fillRect(0, 0, VIEWPORT.width, VIEWPORT.height);
 
   switch (screen) {
     case TITLE_SCREEN:
-      renderText('title screen', CHARSET_SIZE, CHARSET_SIZE);
+      renderText('mirr-0r', VIEWPORT.width / 2, CHARSET_SIZE, ALIGN_CENTER, 5);
       renderText(isMobile ? 'tap to start' : 'press any key', VIEWPORT.width / 2, VIEWPORT.height / 2, ALIGN_CENTER);
       if (konamiIndex === konamiCode.length) {
         renderText('konami mode on', VIEWPORT.width - CHARSET_SIZE, CHARSET_SIZE, ALIGN_RIGHT);
@@ -361,7 +361,7 @@ function renderEntity(entity, ctx = VIEWPORT_CTX) {
 };
 
 function renderMap() {
-  MAP_CTX.fillStyle = '#fff';
+  MAP_CTX.fillStyle = '#000';
   MAP_CTX.fillRect(0, 0, MAP.width, MAP.height);
   // TODO cache map by rendering static entities on the MAP canvas
 };

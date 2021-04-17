@@ -14,7 +14,7 @@ export const ALIGN_RIGHT = 2;
 
 // alphabet sprite, embedded as a base64 encoded dataurl by build script
 import CHARSET from '../img/charset.webp';
-export const CHARSET_SIZE = 8; // in px
+export const CHARSET_SIZE = 5; // in px
 let charset;
 let ctx;
 
