@@ -1,5 +1,5 @@
 import { isMobile } from './mobile';
-import { checkMonetization } from './monetization';
+import { checkMonetization, isMonetizationEnabled, monetizationEarned } from './monetization';
 import { initSpeech } from './speech';
 import { save, load } from './storage';
 import { ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, CHARSET_SIZE, initCharset, renderText } from './text';
@@ -80,7 +80,6 @@ let running = true;
 // GAMEPLAY HANDLERS
 
 function unlockExtraContent() {
-  // NOTE: remember to update the value of the monetization meta tag in src/index.html to your payment pointer
 }
 
 function startGame() {
@@ -337,6 +336,9 @@ function render() {
       break;
     case END_SCREEN:
       renderText('end screen', CHARSET_SIZE, CHARSET_SIZE);
+      if (isMonetizationEnabled()) {
+        renderText(`thx! you earned me ${monetizationEarned()}`, VIEWPORT.width / 2, VIEWPORT.height - CHARSET_SIZE, ALIGN_CENTER);
+      }
       break;
   }
 
@@ -396,7 +398,7 @@ onload = async (e) => {
   document.title = 'MIRR-0R';
 
   onresize();
-  //checkMonetization(unlockExtraContent);
+  checkMonetization(unlockExtraContent);
 
   // initRand(getSeed());
   await initCharset(VIEWPORT_CTX);
