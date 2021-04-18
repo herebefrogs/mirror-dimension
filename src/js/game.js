@@ -36,10 +36,13 @@ const MAP = c.cloneNode();              // full map rendered off screen
 const MAP_CTX = MAP.getContext('2d');
 MAP.width = 280;                        // map size
 MAP.height = 360;
-const VIEWPORT = c.cloneNode();           // visible portion of map/viewport
+const TEXT = c.cloneNode();             // text overlay, same size as viewport
+const TEXT_CTX = TEXT.getContext('2d');
+const VIEWPORT = c.cloneNode();         // visible portion of map/viewport
 const VIEWPORT_CTX = VIEWPORT.getContext('2d');
-VIEWPORT.width = 180;                      // viewport size
-VIEWPORT.height = 240;
+VIEWPORT.width = TEXT.width = 180;      // viewport & text sizes
+VIEWPORT.height = TEXT.height = 240;
+
 
 // camera-window & edge-snapping settings
 const CAMERA_WINDOW_X = 50;
@@ -335,9 +338,16 @@ function blit() {
     0, 0, VIEWPORT.width, VIEWPORT.height,
     0, 0, c.width, c.height
   );
+  // copy text overlay
+  CTX.drawImage(
+    TEXT,
+    0, 0, TEXT.width, TEXT.height,
+    0, 0, c.width, c.height
+  );
 };
 
 function render() {
+  TEXT_CTX.clearRect(0, 0, TEXT.width, TEXT.height);
   VIEWPORT_CTX.fillStyle = '#000';
   VIEWPORT_CTX.fillRect(0, 0, VIEWPORT.width, VIEWPORT.height);
 
@@ -436,7 +446,7 @@ onload = async (e) => {
   checkMonetization(unlockExtraContent);
 
   // initRand(getSeed());
-  await initCharset(VIEWPORT_CTX);
+  await initCharset(TEXT_CTX);
   tileset = await loadImg(TILESET);
   // speak = await initSpeech();
 
@@ -449,7 +459,7 @@ onresize = onrotate = function() {
   c.width = VIEWPORT.width * scaleToFit;
   c.height = VIEWPORT.height * scaleToFit;
   // disable smoothing on image scaling
-  CTX.imageSmoothingEnabled = MAP_CTX.imageSmoothingEnabled = VIEWPORT_CTX.imageSmoothingEnabled = false;
+  CTX.imageSmoothingEnabled = MAP_CTX.imageSmoothingEnabled = TEXT_CTX.imageSmoothingEnabled = VIEWPORT_CTX.imageSmoothingEnabled = false;
 };
 
 // UTILS
