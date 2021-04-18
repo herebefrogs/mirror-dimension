@@ -3,7 +3,7 @@ import { checkMonetization, isMonetizationEnabled, monetizationEarned } from './
 import { initSpeech } from './speech';
 import { save, load } from './storage';
 import { ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, CHARSET_SIZE, initCharset, renderText } from './text';
-import { getSeed, initRand, lerp, loadImg } from './utils';
+import { getSeed, initRand, lerp, loadImg, smoothLerpArray } from './utils';
 import TILESET from '../img/tileset.webp';
 
 
@@ -26,6 +26,8 @@ let countdown; // in seconds
 let hero;      // player ship currently leading the flight
 let flight;    // all player ships part of the flight
 let entities;
+let invertImage = false;
+let invertTime = 0;
 
 let speak;
 
@@ -100,7 +102,7 @@ function startGame() {
   flight = [
     hero,
     createEntity('flight', hero.x - hero.w, hero.y + hero.h),
-    createEntity('flight', hero.x + hero.w, hero.y + hero.h)
+    // createEntity('flight', hero.x + hero.w, hero.y + hero.h)
   ];
   entities = [
     ...flight
@@ -332,12 +334,21 @@ function update() {
 // RENDER HANDLERS
 
 function blit() {
+  CTX.clearRect(0, 0, c.width, c.height);
   // copy backbuffer onto visible canvas, scaling it to screen dimensions
+  CTX.save();
+  const t = (currentTime - invertTime) / 1000;
+  const scaleX = invertImage ? lerp(1, -1, t): lerp(-1, 1, t);
+  const x = scaleX < 0 ? -c.width : 0;
+  const tx = smoothLerpArray([0, c.width/2, 0], t);
+  CTX.translate(tx, 0);
+  CTX.scale(scaleX, 1);
   CTX.drawImage(
     VIEWPORT,
     0, 0, VIEWPORT.width, VIEWPORT.height,
-    0, 0, c.width, c.height
+    x, 0, c.width, c.height
   );
+  CTX.restore();
   // copy text overlay
   CTX.drawImage(
     TEXT,
@@ -496,6 +507,11 @@ onkeydown = function(e) {
           case 'ArrowDown':
           case 'KeyS':
             hero.moveDown = currentTime;
+            break;
+          case 'KeyM':
+            invertImage = !invertImage;
+            invertTime = currentTime;
+            console.log(invertImage, invertTime);
             break;
           case 'KeyP':
             // Pause game as soon as key is pressed

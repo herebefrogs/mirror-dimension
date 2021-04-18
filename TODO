@@ -1,7 +1,7 @@
 game engine
 ===========
 - an (ambitious) game
-  - (DEFER to after jam) swap referential origin to bottom left
+  - BUG: itch.io refuses key control
   - add bullets
   - add enemy to shoot
   - make enemy shoot
@@ -9,9 +9,10 @@ game engine
   - change lose condition to no more ship in flight
   - remove countdown
   - add terrain mirror
-  - add inverted control (copy canvas flipped horizontally, text must be on a separate overlay)
+  - [x] add inverted control (copy canvas flipped horizontally, text must be on a separate overlay)
   - add boss with reflecting mirror
   - add boss hiding behing several mirrors, must hit the right one to destroy the mirror, boss defeated when no more mirror
+  - (DEFER to after jam) swap referential origin to bottom left
 - lerp-smoothing?
 - gamepad support?
 - support multiple voices for speech synthesis?
