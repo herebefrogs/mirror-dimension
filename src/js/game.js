@@ -22,7 +22,6 @@ let screen = TITLE_SCREEN;
 const RADIUS_ONE_AT_45_DEG = Math.cos(Math.PI / 4);
 const TIME_TO_FULL_SPEED = 150;                // in millis, duration till going full speed in any direction
 
-let countdown; // in seconds
 let hero;      // player ship currently leading the flight
 let flight;    // all player ships part of the flight
 let entities;
@@ -94,7 +93,6 @@ function unlockExtraContent() {
 
 function startGame() {
   konamiIndex = 0;
-  countdown = 60;
   viewportOffsetX = (MAP.width - VIEWPORT.width) / 2;
   viewportOffsetY = MAP.height - VIEWPORT.height;
   // TODO the whole referentiel is off due to screen (0,0) being top left rather than bottom left
@@ -300,10 +298,6 @@ function updateEntityPositionAndAnimationFrame(entity) {
 function update() {
   switch (screen) {
     case GAME_SCREEN:
-      countdown -= elapsedTime;
-      if (countdown < 0) {
-        screen = END_SCREEN;
-      }
       // scrolling
       const scrolledDistance = ATLAS.scroll.speed.y*elapsedTime;
       flight.forEach(ship => ship.y -= scrolledDistance);
@@ -379,8 +373,7 @@ function render() {
         viewportOffsetX, viewportOffsetY, VIEWPORT.width, VIEWPORT.height,
         0, 0, VIEWPORT.width, VIEWPORT.height
       );
-      renderText('game screen', CHARSET_SIZE, CHARSET_SIZE);
-      renderCountdown();
+      // renderText('game screen', CHARSET_SIZE, CHARSET_SIZE);
       // uncomment to debug mobile input handlers
       // renderDebugTouch();
       entities.forEach(entity => renderEntity(entity));
@@ -394,13 +387,6 @@ function render() {
   }
 
   blit();
-};
-
-function renderCountdown() {
-  const minutes = Math.floor(Math.ceil(countdown) / 60);
-  const seconds = Math.ceil(countdown) - minutes * 60;
-  renderText(`${minutes}:${seconds <= 9 ? '0' : ''}${seconds}`, VIEWPORT.width - CHARSET_SIZE, CHARSET_SIZE, ALIGN_RIGHT);
-
 };
 
 function renderEntity(entity, ctx = VIEWPORT_CTX) {
