@@ -7,6 +7,8 @@ import { lerp, loadImg, rand, setRandSeed, smoothLerpArray } from './utils';
 import TILESET from '../img/tileset.webp';
 
 
+const capturer = new CCapture( { format: 'webm' } );
+
 const konamiCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
 let konamiIndex = 0;
 
@@ -421,6 +423,8 @@ function blit() {
     0, 0, TEXT.width, TEXT.height,
     0, 0, c.width, c.height
   );
+  
+  capturer.capture(c);
 };
 
 function render() {
@@ -550,6 +554,8 @@ onload = async (e) => {
   addEventListener('keydown', keyPressed);
   addEventListener('keyup', keyReleased);
 
+  capturer.start()
+
   toggleLoop(true);
 };
 
@@ -607,6 +613,8 @@ function keyPressed(e) {
             invertTime = currentTime;
             break;
           case 'KeyP':
+            capturer.stop();
+            capturer.save();
             // Pause game as soon as key is pressed
             toggleLoop(!running);
             break;
