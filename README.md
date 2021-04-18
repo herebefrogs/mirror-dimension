@@ -1,4 +1,4 @@
-MIRR-0R
+The MIRЯ0Я Dimension
 =======
 
 My entry for Gamedev.js jam 2021 on the theme "mirror"

@@ -343,7 +343,9 @@ function render() {
 
   switch (screen) {
     case TITLE_SCREEN:
-      renderText('mirr-0r', VIEWPORT.width / 2, CHARSET_SIZE, ALIGN_CENTER, 2);
+      renderText('the', VIEWPORT.width / 2, CHARSET_SIZE, ALIGN_CENTER, 2);
+      renderText('mirЯ0Я', VIEWPORT.width / 2, 3.6*CHARSET_SIZE, ALIGN_CENTER, 2);
+      renderText('dimension', VIEWPORT.width / 2, 6.2*CHARSET_SIZE, ALIGN_CENTER, 2);
       renderText(isMobile ? 'tap to start' : 'press any key', VIEWPORT.width / 2, VIEWPORT.height / 2, ALIGN_CENTER);
       if (konamiIndex === konamiCode.length) {
         renderText('konami mode on', VIEWPORT.width - CHARSET_SIZE, CHARSET_SIZE, ALIGN_RIGHT);
@@ -428,7 +430,7 @@ function toggleLoop(value) {
 
 onload = async (e) => {
   // the real "main" of the game
-  document.title = 'MIRR-0R';
+  document.title = 'The MIЯЯ0Я Dimension';
 
   onresize();
   checkMonetization(unlockExtraContent);

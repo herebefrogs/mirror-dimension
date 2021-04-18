@@ -6,7 +6,7 @@ import { loadImg } from './utils';
 // L = left arrow
 // R = right arrow
 // T = teapot icon
-export const ALPHABET = 'abcdefghijklmnopqrstuvwxyz0123456789.:!-%,/';
+export const ALPHABET = 'abcdefghijklmnopqrstuvwxyz0123456789.:!?-%,/#[]\'UDLRЯ';
 
 export const ALIGN_LEFT = 0;
 export const ALIGN_CENTER = 1;

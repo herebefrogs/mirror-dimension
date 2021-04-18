@@ -67,7 +67,7 @@ jobs:
         env:
           BUTLER_CREDENTIALS: ${{ secrets.BUTLER_CREDENTIALS }}
           CHANNEL: html
-          ITCH_GAME: mirr-0r
+          ITCH_GAME: mirror-dimension
           ITCH_USER: herebefrogs
           PACKAGE: dist/index.html
 

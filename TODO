@@ -1,6 +1,17 @@
 game engine
 ===========
 - an (ambitious) game
+  - (DEFER to after jam) swap referential origin to bottom left
+  - add bullets
+  - add enemy to shoot
+  - make enemy shoot
+  - when hero destroyed, another ship in the flight takes over
+  - change lose condition to no more ship in flight
+  - remove countdown
+  - add terrain mirror
+  - add inverted control (copy canvas flipped horizontally, text must be on a separate overlay)
+  - add boss with reflecting mirror
+  - add boss hiding behing several mirrors, must hit the right one to destroy the mirror, boss defeated when no more mirror
 - lerp-smoothing?
 - gamepad support?
 - support multiple voices for speech synthesis?
