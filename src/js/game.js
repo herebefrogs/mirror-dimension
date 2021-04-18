@@ -200,40 +200,37 @@ function correctAABBCollision(entity1, entity2, test) {
 };
 
 function constrainFlightToViewport(entity) {
-  // TODO
-  // left-most ship
-  if (entity.x < 0) {
-    // adjust rest of flight if corrected
-    entity.x = 0;
-    // right-most ship
-  } else if (entity.x > MAP.width - entity.w) {
-    // adjust rest of flight if corrected
-    entity.x = MAP.width - entity.w;
+  const horizontallySorted = flight.sort((ship1, ship2) => ship1.x < ship2.x ? -1 : 1);
+  const leftMost = horizontallySorted[0];
+  const rightMost = horizontallySorted[horizontallySorted.length - 1];
+  const verticallySorted = flight.sort((ship1, ship2) => ship1.y < ship2.y ? -1 : 1);
+  const topMost = verticallySorted[0];
+  const bottomMost = verticallySorted[verticallySorted.length - 1];
+
+  if (leftMost.x < 0) {
+    const offsetX = -leftMost.x;
+    flight.forEach(ship => { ship.x += offsetX });
+  } else if (rightMost.x > MAP.width - rightMost.w) {
+    const offsetX = rightMost.x - MAP.width + rightMost.w;
+    flight.forEach(ship => { ship.x -= offsetX });
   }
-  // top-most ship
-  if (entity.y < 0) {
-    entity.y = 0;
-  // bottom most ship
-  } else if (entity.y > MAP.height - entity.h) {
-    entity.y = MAP.height - entity.h;
+  if (topMost.y < viewportOffsetY) {
+    const offsetY = viewportOffsetY - topMost.y;
+    flight.forEach(ship => { ship.y += offsetY });
+  } else if (bottomMost.y > viewportOffsetY + VIEWPORT.height - bottomMost.h) {
+    const offsetY = bottomMost.y - viewportOffsetY - VIEWPORT.height + bottomMost.h;
+    flight.forEach(ship => { ship.y -= offsetY });
   }
 };
 
 
 function updateCameraWindow() {
-  // TODO same as constrainFlightToViewport
   // edge snapping
   if (0 < viewportOffsetX && hero.x < viewportOffsetX + CAMERA_WINDOW_X) {
     viewportOffsetX = Math.max(0, hero.x - CAMERA_WINDOW_X);
   }
   else if (viewportOffsetX < MAP.width - VIEWPORT.width && hero.x + hero.w > viewportOffsetX + CAMERA_WINDOW_WIDTH) {
     viewportOffsetX = Math.min(MAP.width - VIEWPORT.width, hero.x + hero.w - CAMERA_WINDOW_WIDTH);
-  }
-  if (0 < viewportOffsetY && hero.y < viewportOffsetY + CAMERA_WINDOW_Y) {
-    viewportOffsetY = Math.max(0, hero.y - CAMERA_WINDOW_Y);
-  }
-  else if (viewportOffsetY < MAP.height - VIEWPORT.height && hero.y + hero.h > viewportOffsetY + CAMERA_WINDOW_HEIGHT) {
-    viewportOffsetY = Math.min(MAP.height - VIEWPORT.height, hero.y + hero.h - CAMERA_WINDOW_HEIGHT);
   }
 };
 
