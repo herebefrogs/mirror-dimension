@@ -1,7 +1,6 @@
 game engine
 ===========
 - an (ambitious) game
-  - BUG: itch.io refuses key control
   - BUG: lead ship move sometimes when hammering controls
   - add bullets
   - add enemy to shoot

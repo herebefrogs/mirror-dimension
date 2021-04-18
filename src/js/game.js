@@ -464,6 +464,10 @@ onload = async (e) => {
   tileset = await loadImg(TILESET);
   // speak = await initSpeech();
 
+  // itch.io hack
+  addEventListener('keydown', keyPressed);
+  addEventListener('keyup', keyReleased);
+
   toggleLoop(true);
 };
 
@@ -485,7 +489,7 @@ document.onvisibilitychange = function(e) {
 
 // INPUT HANDLERS
 
-onkeydown = function(e) {
+function keyPressed(e) {
   // prevent itch.io from scrolling the page up/down
   e.preventDefault();
 
@@ -514,7 +518,6 @@ onkeydown = function(e) {
           case 'KeyM':
             invertImage = !invertImage;
             invertTime = currentTime;
-            console.log(invertImage, invertTime);
             break;
           case 'KeyP':
             // Pause game as soon as key is pressed
@@ -526,7 +529,7 @@ onkeydown = function(e) {
   }
 };
 
-onkeyup = function(e) {
+function keyReleased(e) {
   switch (screen) {
     case TITLE_SCREEN:
       if (e.which !== konamiCode[konamiIndex] || konamiIndex === konamiCode.length) {
