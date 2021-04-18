@@ -59,15 +59,19 @@ const ATLAS = {
       { x: 0, y: 0, w: 16, h: 16 },
       { x: 0, y: 16, w: 16, h: 16 }
     ],
-    speed: 25,
+    speed: 45,
   },
   flight: {
     move: [
       { x: 16, y: 0, w: 16, h: 16 },
       { x: 16, y: 16, w: 16, h: 16 }
     ],
-    speed: 25,
+    speed: 45,
   },
+  shipShadow: [
+    { x: 32, y: 0, w: 16, h: 16 },
+    { x: 32, y: 16, w: 16, h: 16 }
+  ],
   scroll: {
     speed: {
       y: 50 // px per sec
@@ -353,7 +357,7 @@ function blit() {
 
 function render() {
   TEXT_CTX.clearRect(0, 0, TEXT.width, TEXT.height);
-  VIEWPORT_CTX.fillStyle = '#000';
+  VIEWPORT_CTX.fillStyle = '#ccc';
   VIEWPORT_CTX.fillRect(0, 0, VIEWPORT.width, VIEWPORT.height);
 
   switch (screen) {
@@ -376,6 +380,7 @@ function render() {
       // renderText('game screen', CHARSET_SIZE, CHARSET_SIZE);
       // uncomment to debug mobile input handlers
       // renderDebugTouch();
+      entities.forEach(entity => renderReflection(entity));
       entities.forEach(entity => renderEntity(entity));
       break;
     case END_SCREEN:
@@ -389,6 +394,21 @@ function render() {
   blit();
 };
 
+function renderReflection(entity, ctx = VIEWPORT_CTX) {
+  switch(entity.type) {
+    case 'hero':
+    case 'flight':
+      const sprite = ATLAS['shipShadow'][entity.frame];
+      // TODO skip draw if image outside of visible canvas
+      ctx.drawImage(
+        tileset,
+        sprite.x, sprite.y, sprite.w, sprite.h,
+        Math.round(entity.x - viewportOffsetX), Math.round(entity.y + 2 * entity.h - viewportOffsetY), sprite.w, sprite.h
+      );
+      break;
+  }
+}
+
 function renderEntity(entity, ctx = VIEWPORT_CTX) {
   const sprite = ATLAS[entity.type][entity.action][entity.frame];
   // TODO skip draw if image outside of visible canvas
@@ -400,9 +420,9 @@ function renderEntity(entity, ctx = VIEWPORT_CTX) {
 };
 
 function renderMap() {
-  MAP_CTX.fillStyle = '#777';
-  MAP_CTX.fillRect(0, 0, MAP.width, MAP.height);
-  MAP_CTX.fillStyle ='#ccc';
+  MAP_CTX.clearRect(0, 0, MAP.width, MAP.height);
+
+  MAP_CTX.fillStyle ='#777';
   [0, 1, 2].forEach(i => {
     MAP_CTX.fillRect(0, i*120, 70, 60);
     MAP_CTX.fillRect(210, i*120, 70, 60);
