@@ -291,9 +291,21 @@ function updateEntityPositionAndAnimationFrame(entity) {
   }
   // update position
   const scale = entity.moveX && entity.moveY ? RADIUS_ONE_AT_45_DEG : 1;
+  if (!scale) {
+    console.log(entity.moveX, entity.moveY, entity.moveX && entity.moveY, RADIUS_ONE_AT_45_DEG, 1);
+    debugger;
+  }
   const distance = entity.speed * elapsedTime * scale;
+  if (!distance) {
+    console.log(entity.speed, elapsedTime, scale);
+    debugger;
+  }
   entity.x += distance * entity.moveX;
   entity.y += distance * entity.moveY;
+
+  if (hero.x < flight[1].x || hero.y > flight[1].y) {
+    debugger;
+  }
 };
 
 function update() {

@@ -1,7 +1,7 @@
 game engine
 ===========
 - an (ambitious) game
-  - BUG: lead ship move sometimes when hammering controls
+  - BUG: lead ship move sometimes when hammering controls -> debugger statements in place
   - add bullets
   - add enemy to shoot
   - make enemy shoot
