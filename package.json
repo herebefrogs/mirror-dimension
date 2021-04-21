@@ -1,7 +1,7 @@
 {
-  "name": "mirr-0r",
+  "name": "mirror-dimension",
   "version": "1.0.0",
-  "description": "MIIR-0R for Gamedev.js jam 2021 on theme 'mirror'",
+  "description": "The MIRЯ0Я Dimension for Gamedev.js jam 2021 on theme 'mirror'",
   "main": "src/js/game.js",
   "scripts": {
     "clean": "rm -rf dist && mkdir dist",
@@ -32,11 +32,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/herebefrogs/gamejam-boilerplate.git"
+    "url": "git+https://github.com/herebefrogs/mirror-dimension.git"
   },
   "author": "Jerome Lecomte <jerome@herebefrogs.com>",
   "bugs": {
-    "url": "https://github.com/herebefrogs/gamejam-boilerplate/issues"
+    "url": "https://github.com/herebefrogs/mirror-dimension/issues"
   },
-  "homepage": "https://github.com/herebefrogs/gamejam-boilerplate#readme"
+  "homepage": "https://github.com/herebefrogs/mirror-dimension#readme"
 }

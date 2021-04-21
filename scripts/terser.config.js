@@ -4,6 +4,7 @@
   "toplevel": true,
   "compress": {
     "drop_debugger": "true",
+    "booleans_as_integers": "true",
     "keep_fargs": false,
     "passes": 5,
     "pure_funcs": ["assert", "debug"],
