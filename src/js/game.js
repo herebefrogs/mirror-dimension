@@ -60,18 +60,40 @@ const ATLAS = {
       { x: 0, y: 16, w: 16, h: 16 }
     ],
     speed: 45,
+    fireCadence: 0.2    // seconds between shots
   },
-  flight: {
+  wingfolk: {
     move: [
       { x: 16, y: 0, w: 16, h: 16 },
       { x: 16, y: 16, w: 16, h: 16 }
     ],
     speed: 45,
+    fireCadence: 0.2    // seconds between shots
   },
   shipShadow: [
     { x: 32, y: 0, w: 16, h: 16 },
     { x: 32, y: 16, w: 16, h: 16 }
   ],
+  bullet: {
+    move: [
+      // flame #1 bullet
+      { x: 48, y: 0, w: 4, h: 16 },
+      { x: 52, y: 0, w: 4, h: 16 },
+      // flane #2
+      // { x: 56, y: 0, w: 4, h: 16 },
+      // { x: 60, y: 0, w: 4, h: 16 }
+    ],
+    speed: 200,
+  },
+  alien1: {
+    move: [
+      { x: 48, y: 32, w: 16, h: 16 },
+      { x: 0, y: 32, w: 16, h: 16 },
+      { x: 16, y: 32, w: 16, h: 16 },
+      { x: 32, y: 32, w: 16, h: 16 }
+    ],
+    speed: 25,
+  },
   scroll: {
     speed: {
       y: 50 // px per sec
@@ -103,8 +125,8 @@ function startGame() {
   hero = createEntity('hero', MAP.width / 2, MAP.height - 3*ATLAS.hero.move[0].h);
   flight = [
     hero,
-    createEntity('flight', hero.x - hero.w, hero.y + hero.h),
-    // createEntity('flight', hero.x + hero.w, hero.y + hero.h)
+    createEntity('wingfolk', hero.x - hero.w, hero.y + hero.h),
+    createEntity('wingfolk', hero.x + hero.w, hero.y + 1.5*hero.h)
   ];
   entities = [
     ...flight
@@ -239,6 +261,8 @@ function createEntity(type, x = 0, y = 0) {
   const sprite = ATLAS[type][action][0];
   return {
     action,
+    fireTime: 0,
+    fireCadence: ATLAS[type].fireCadence,
     frame: 0,
     frameTime: 0,
     h: sprite.h,
@@ -308,6 +332,24 @@ function updateEntityPositionAndAnimationFrame(entity) {
   }
 };
 
+function fireBullet(entity) {
+  switch (entity.type) {
+    case 'hero':
+    case 'wingfolk':
+      entity.fireTime += elapsedTime;
+      if (entity.fireTime >= entity.fireCadence) {
+        entity.fireTime -= entity.fireCadence;
+        const bullet = createEntity('bullet', entity.x + entity.w / 2, entity.y - entity.h);
+        bullet.x -= bullet.w / 2;
+        // move up always
+        bullet.moveY = -1;
+        entities.push(bullet);
+        // entities.unshift(bullet);
+      }
+      break;
+  }
+}
+
 function update() {
   switch (screen) {
     case GAME_SCREEN:
@@ -325,7 +367,8 @@ function update() {
       }
       updateHeroInput();
       entities.forEach(updateEntityPositionAndAnimationFrame);
-      // TODO update for flight
+      entities.forEach(fireBullet);
+      // TODO update for flight & bullets
       entities.slice(1).forEach((entity) => {
         const test = testAABBCollision(hero, entity);
         if (test.collide) {
@@ -334,6 +377,9 @@ function update() {
       });
       constrainFlightToViewport(hero);
       updateCameraWindow();
+      // remove entities who have gone beyond the top of the screen plus 2 sprite height (for safety)
+      // TODO remove the ones who get passed the bottom of the screen
+      entities = entities.filter(entity => entity.y > viewportOffsetY - 2*entity.h);
       break;
   }
 };
@@ -406,7 +452,7 @@ function render() {
 function renderReflection(entity, ctx = VIEWPORT_CTX) {
   switch(entity.type) {
     case 'hero':
-    case 'flight':
+    case 'wingfolk':
       const sprite = ATLAS['shipShadow'][entity.frame];
       // TODO skip draw if image outside of visible canvas
       ctx.drawImage(

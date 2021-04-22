@@ -2,12 +2,12 @@ game engine
 ===========
 - an (ambitious) game
   - BUG: lead ship move sometimes when hammering controls -> debugger statements in place
-  - add bullets
+  - [x] add bullets
   - add enemy to shoot
   - make enemy shoot
   - when hero destroyed, another ship in the flight takes over
   - change lose condition to no more ship in flight
-  - remove countdown
+  - [x] remove countdown
   - [x] add inverted control (copy canvas flipped horizontally, text must be on a separate overlay)
   - add boss with reflecting mirror
   - add boss hiding behing several mirrors, must hit the right one to destroy the mirror, boss defeated when no more mirror
