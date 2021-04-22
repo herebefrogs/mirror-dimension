@@ -350,21 +350,24 @@ function fireBullet(entity) {
   }
 }
 
+function updateScrolling() {
+  const scrolledDistance = ATLAS.scroll.speed.y*elapsedTime;
+  flight.forEach(ship => ship.y -= scrolledDistance);
+  viewportOffsetY -= scrolledDistance;
+  // infinite scrolling
+  if (viewportOffsetY < 0) {
+    viewportOffsetY += MAP.height - VIEWPORT.height;
+    // TOOD this is not nice, find a way to remove this hack
+    entities.forEach(entity => {
+      entity.y += MAP.height - VIEWPORT.height
+    });
+  }
+}
+
 function update() {
   switch (screen) {
     case GAME_SCREEN:
-      // scrolling
-      const scrolledDistance = ATLAS.scroll.speed.y*elapsedTime;
-      flight.forEach(ship => ship.y -= scrolledDistance);
-      viewportOffsetY -= scrolledDistance;
-      // infinite scrolling
-      if (viewportOffsetY < 0) {
-        viewportOffsetY += MAP.height - VIEWPORT.height;
-        // TOOD remove hack
-        entities.forEach(entity => {
-          entity.y += MAP.height - VIEWPORT.height
-        });
-      }
+      updateScrolling();
       updateHeroInput();
       entities.forEach(updateEntityPositionAndAnimationFrame);
       entities.forEach(fireBullet);
