@@ -3,7 +3,7 @@ import { checkMonetization, isMonetizationEnabled, monetizationEarned } from './
 import { initSpeech } from './speech';
 import { save, load } from './storage';
 import { ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, CHARSET_SIZE, initCharset, renderText } from './text';
-import { getSeed, initRand, lerp, loadImg, smoothLerpArray } from './utils';
+import { getSeed, initRand, lerp, loadImg, rand, smoothLerpArray } from './utils';
 import TILESET from '../img/tileset.webp';
 
 
@@ -27,6 +27,7 @@ let flight;    // all player ships part of the flight
 let entities;
 let invertImage = false;
 let invertTime = 0;
+let lastSpawnDuration = 0;
 
 let speak;
 
@@ -340,11 +341,13 @@ function fireBullet(entity) {
       if (entity.fireTime >= entity.fireCadence) {
         entity.fireTime -= entity.fireCadence;
         const bullet = createEntity('bullet', entity.x + entity.w / 2, entity.y - entity.h);
+        // center bullet on the nose of the hero/wingfolk ship
         bullet.x -= bullet.w / 2;
-        // move up always
+        // always move up
         bullet.moveY = -1;
+
+        // add bullets at the end, so they are drawn on top of other sprites
         entities.push(bullet);
-        // entities.unshift(bullet);
       }
       break;
   }
@@ -364,12 +367,28 @@ function updateScrolling() {
   }
 }
 
+function spawnEnemy() {
+  lastSpawnDuration += elapsedTime;
+
+  if (rand() < lerp(0, 1, lastSpawnDuration / 30)) {
+    lastSpawnDuration = 0;
+    const alien = createEntity('alien1', viewportOffsetX + rand(0, VIEWPORT.width), viewportOffsetY);
+    // start off screen
+    alien.y -= alien.h;
+    // always move down
+    alien.moveY = 1;
+
+    entities.push(alien);
+  }
+};
+
 function update() {
   switch (screen) {
     case GAME_SCREEN:
       updateScrolling();
       updateHeroInput();
       entities.forEach(updateEntityPositionAndAnimationFrame);
+      spawnEnemy();
       entities.forEach(fireBullet);
       // TODO update for flight & bullets
       entities.slice(1).forEach((entity) => {
@@ -381,8 +400,9 @@ function update() {
       constrainFlightToViewport(hero);
       updateCameraWindow();
       // remove entities who have gone beyond the top of the screen plus 2 sprite height (for safety)
-      // TODO remove the ones who get passed the bottom of the screen
-      entities = entities.filter(entity => entity.y > viewportOffsetY - 2*entity.h);
+      // and the ones who got passed the bottom of the screen plus 1 sprite height (for safety)
+      // NOTE: filter actually keeps the entities still in the viewport, discarding the ones to remove
+      entities = entities.filter(entity => (entity.y < viewportOffsetY + VIEWPORT.height + entity.h) && (entity.y > viewportOffsetY - 2*entity.h));
       break;
   }
 };

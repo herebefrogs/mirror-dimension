@@ -70,12 +70,16 @@ function createRandSeed() {
 return btoa(prng()).slice(3, 9)
 }
 
-export function rand(min, max) {
-  return Math.floor(prng() * (max + 1 - min) + min);
+export function rand(min = 0, max = 0) {
+  return prng() * (max + 1 - min) + min;
+};
+
+export function randInt(min = 0, max = 0) {
+  return Math.floor(rand(min, max));
 };
 
 export function choice(values) {
-  return values[rand(0, values.length - 1)];
+  return values[randInt(0, values.length - 1)];
 };
 
 // LERP

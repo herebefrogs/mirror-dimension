@@ -3,7 +3,8 @@ game engine
 - an (ambitious) game
   - BUG: lead ship move sometimes when hammering controls -> debugger statements in place
   - [x] add bullets
-  - add enemy to shoot
+  - [x] add enemy to shoot down
+  - actually shoot down the enemies
   - make enemy shoot
   - when hero destroyed, another ship in the flight takes over
   - change lose condition to no more ship in flight
