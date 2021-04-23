@@ -2,7 +2,7 @@ import { isMobile } from './mobile';
 import { checkMonetization, isMonetizationEnabled, monetizationEarned } from './monetization';
 import { initSpeech } from './speech';
 import { save, load } from './storage';
-import { ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, CHARSET_SIZE, initCharset, renderText } from './text';
+import { ALIGN_CENTER, ALIGN_RIGHT, CHARSET_SIZE, initCharset, renderText } from './text';
 import { lerp, loadImg, rand, setRandSeed, smoothLerpArray } from './utils';
 import TILESET from '../img/tileset.webp';
 
@@ -28,9 +28,12 @@ let entities;
 let invertImage = false;
 let invertTime = 0;
 let lastSpawnDuration = 0;
+let score;
+let highscore = load('highscore');
 
 const COLLISION_GROUP_FLIGHT = 1;
 const COLLISION_GROUP_ALIEN = 2;
+
 
 let speak;
 
@@ -132,6 +135,7 @@ function unlockExtraContent() {
 
 function startGame() {
   konamiIndex = 0;
+  score = 0;
   viewportOffsetX = (MAP.width - VIEWPORT.width) / 2;
   viewportOffsetY = MAP.height - VIEWPORT.height;
   // TODO the whole referentiel is off due to screen (0,0) being top left rather than bottom left
@@ -327,6 +331,7 @@ function update() {
           if (testAABBCollision(entity1, entity2)) {
             entity1.dying = true;
             entity2.dying = true;
+            score += 10;
           }
         });
       });
@@ -342,6 +347,10 @@ function update() {
       ));
       flight = flight.filter(ship => !ship.dying);
       if (!flight.length) {
+        if (score > highscore) {
+          save('highscore', score);
+          highscore = score;
+        }
         screen = END_SCREEN;
       }
       break;
@@ -381,15 +390,21 @@ function render() {
 
   switch (screen) {
     case TITLE_SCREEN:
-      renderText('the', VIEWPORT.width / 2, CHARSET_SIZE, ALIGN_CENTER, 2);
-      renderText('mirЯ0Я', VIEWPORT.width / 2, 3.6*CHARSET_SIZE, ALIGN_CENTER, 2);
-      renderText('dimension', VIEWPORT.width / 2, 6.2*CHARSET_SIZE, ALIGN_CENTER, 2);
-      renderText(isMobile ? 'tap to start' : 'press any key', VIEWPORT.width / 2, VIEWPORT.height / 2, ALIGN_CENTER);
-      if (konamiIndex === konamiCode.length) {
-        renderText('konami mode on', VIEWPORT.width - CHARSET_SIZE, CHARSET_SIZE, ALIGN_RIGHT);
-      }
+      renderText('jerome lecomte presents', TEXT.width / 2, CHARSET_SIZE, ALIGN_CENTER, 1);
+
+      renderText('the', TEXT.width / 2, 6*CHARSET_SIZE, ALIGN_CENTER, 2);
+      renderText('mirЯ0Я', TEXT.width / 2, 8.6*CHARSET_SIZE, ALIGN_CENTER, 2);
+      renderText('dimension', TEXT.width / 2, 11.2*CHARSET_SIZE, ALIGN_CENTER, 2);
+      renderText(`${isMobile ? 'swipe' : 'wasd/UDLR'} to move`, TEXT.width / 2, TEXT.height / 2, ALIGN_CENTER);
+      renderText(`${isMobile ? 'tap' : '[enter]'} to start`, TEXT.width / 2, TEXT.height / 2 + 2.4 * CHARSET_SIZE, ALIGN_CENTER);
+      renderText('gamedev.js jam 2021', TEXT.width / 2, TEXT.height - 2* CHARSET_SIZE, ALIGN_CENTER);
+      // if (konamiIndex === konamiCode.length) {
+      //   renderText('konami mode on', TEXT.width - CHARSET_SIZE, CHARSET_SIZE, ALIGN_RIGHT);
+      // }
       break;
     case GAME_SCREEN:
+      renderText('score:', CHARSET_SIZE, CHARSET_SIZE);
+      renderText(`${score}`, TEXT.width - CHARSET_SIZE, CHARSET_SIZE, ALIGN_RIGHT);
       VIEWPORT_CTX.drawImage(
         MAP,
         // adjust x/y offset
@@ -403,9 +418,14 @@ function render() {
       entities.forEach(entity => renderEntity(entity));
       break;
     case END_SCREEN:
-      renderText('end screen', CHARSET_SIZE, CHARSET_SIZE);
+      renderText('highscore:', CHARSET_SIZE, CHARSET_SIZE);
+      renderText(`${highscore}`, TEXT.width - CHARSET_SIZE, CHARSET_SIZE, ALIGN_RIGHT);
+      renderText('your score:', CHARSET_SIZE, 3 * CHARSET_SIZE);
+      renderText(`${score}`, TEXT.width - CHARSET_SIZE, 3 * CHARSET_SIZE, ALIGN_RIGHT);
+      renderText('game over', TEXT.width / 2, TEXT.height / 2 - 2 * CHARSET_SIZE, ALIGN_CENTER, 2);
+      renderText(`${isMobile ? 'tap' : '[enter]'} to restart`, TEXT.width / 2, TEXT.height / 2 + CHARSET_SIZE, ALIGN_CENTER);
       if (isMonetizationEnabled()) {
-        renderText(`thx! you earned me ${monetizationEarned()}`, VIEWPORT.width / 2, VIEWPORT.height - CHARSET_SIZE, ALIGN_CENTER);
+        renderText(`I earned ${monetizationEarned()}`, TEXT.width / 2, TEXT.height - CHARSET_SIZE, ALIGN_CENTER);
       }
       break;
   }
@@ -554,10 +574,14 @@ function keyPressed(e) {
 function keyReleased(e) {
   switch (screen) {
     case TITLE_SCREEN:
-      if (e.which !== konamiCode[konamiIndex] || konamiIndex === konamiCode.length) {
-        startGame();
-      } else {
-        konamiIndex++;
+      switch (e.code) {
+        case 'Enter':
+          startGame();
+          break;
+        default:
+          if (e.which === konamiCode[konamiIndex] && konamiIndex < konamiCode.length) {
+            konamiIndex++;
+          }
       }
       break;
     case GAME_SCREEN:
@@ -603,8 +627,8 @@ function keyReleased(e) {
         case 'KeyT':
           open(`https://twitter.com/intent/tweet?text=viral%20marketing%20message%20https%3A%2F%2Fgoo.gl%2F${'some tiny Google url here'}`, '_blank');
           break;
-        default:
-          screen = TITLE_SCREEN;
+        case 'Enter':
+          startGame();
           break;
       }
       break;

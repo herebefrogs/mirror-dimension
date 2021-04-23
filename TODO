@@ -7,10 +7,14 @@ game engine
   - [x] actually shoot down the enemies
   - make enemy shoot
   - when hero destroyed, another ship in the flight takes over
+  - death animation
+  - fix tap control
+  - add boss with reflecting mirror
+  - keyboard control localization
+  - tweet score
   - [x] change lose condition to no more ship in flight
   - [x] remove countdown
   - [x] add inverted control (copy canvas flipped horizontally, text must be on a separate overlay)
-  - add boss with reflecting mirror
   - add boss hiding behing several mirrors, must hit the right one to destroy the mirror, boss defeated when no more mirror
   - (DEFER to affer jam) add terrain mirror
   - (DEFER to after jam) swap referential origin to bottom left
