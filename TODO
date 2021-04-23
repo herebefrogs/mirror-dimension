@@ -4,10 +4,10 @@ game engine
   - BUG: lead ship move sometimes when hammering controls -> debugger statements in place
   - [x] add bullets
   - [x] add enemy to shoot down
-  - actually shoot down the enemies
+  - [x] actually shoot down the enemies
   - make enemy shoot
   - when hero destroyed, another ship in the flight takes over
-  - change lose condition to no more ship in flight
+  - [x] change lose condition to no more ship in flight
   - [x] remove countdown
   - [x] add inverted control (copy canvas flipped horizontally, text must be on a separate overlay)
   - add boss with reflecting mirror

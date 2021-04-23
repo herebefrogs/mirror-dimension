@@ -29,6 +29,9 @@ let invertImage = false;
 let invertTime = 0;
 let lastSpawnDuration = 0;
 
+const COLLISION_GROUP_FLIGHT = 1;
+const COLLISION_GROUP_ALIEN = 2;
+
 let speak;
 
 // RENDER VARIABLES
@@ -95,6 +98,15 @@ const ATLAS = {
     ],
     speed: 25,
   },
+  alien2: {
+    move: [
+      { x: 0, y: 48, w: 16, h: 16 },
+      { x: 16, y: 48, w: 16, h: 16 },
+      { x: 32, y: 48, w: 16, h: 16 },
+      { x: 48, y: 48, w: 16, h: 16 }
+    ],
+    speed: 25,
+  },
   scroll: {
     speed: {
       y: 50 // px per sec
@@ -123,11 +135,11 @@ function startGame() {
   viewportOffsetX = (MAP.width - VIEWPORT.width) / 2;
   viewportOffsetY = MAP.height - VIEWPORT.height;
   // TODO the whole referentiel is off due to screen (0,0) being top left rather than bottom left
-  hero = createEntity('hero', MAP.width / 2, MAP.height - 3*ATLAS.hero.move[0].h);
+  hero = createEntity('hero', COLLISION_GROUP_FLIGHT, MAP.width / 2, MAP.height - 3*ATLAS.hero.move[0].h);
   flight = [
     hero,
-    createEntity('wingfolk', hero.x - hero.w, hero.y + hero.h),
-    createEntity('wingfolk', hero.x + hero.w, hero.y + 1.5*hero.h)
+    createEntity('wingfolk', COLLISION_GROUP_FLIGHT, hero.x - hero.w, hero.y + hero.h),
+    createEntity('wingfolk', COLLISION_GROUP_FLIGHT, hero.x + hero.w, hero.y + 1.5*hero.h)
   ];
   entities = [
     ...flight
@@ -137,92 +149,16 @@ function startGame() {
 };
 
 function testAABBCollision(entity1, entity2) {
-  const test = {
-    entity1MaxX: entity1.x + entity1.w,
-    entity1MaxY: entity1.y + entity1.h,
-    entity2MaxX: entity2.x + entity2.w,
-    entity2MaxY: entity2.y + entity2.h,
-  };
-
-  test.collide = entity1.x < test.entity2MaxX
-    && test.entity1MaxX > entity2.x
-    && entity1.y < test.entity2MaxY
-    && test.entity1MaxY > entity2.y;
-
-  return test;
+  return (
+    entity1.collisionGroup !== entity2.collisionGroup
+    && entity1.x < entity2.x + entity2.w
+    && entity1.x + entity1.w > entity2.x
+    && entity1.y < entity2.y + entity2.h
+    && entity1.y + entity1.h > entity2.y
+  )
 };
 
-// entity1 collided into entity2
-function correctAABBCollision(entity1, entity2, test) {
-  const { entity1MaxX, entity1MaxY, entity2MaxX, entity2MaxY } = test;
-
-  const deltaMaxX = entity1MaxX - entity2.x;
-  const deltaMaxY = entity1MaxY - entity2.y;
-  const deltaMinX = entity2MaxX - entity1.x;
-  const deltaMinY = entity2MaxY - entity1.y;
-
-  // AABB collision response (homegrown wall sliding, not physically correct
-  // because just pushing along one axis by the distance overlapped)
-
-  // entity1 moving down/right
-  if (entity1.moveX > 0 && entity1.moveY > 0) {
-    if (deltaMaxX < deltaMaxY) {
-      // collided right side first
-      entity1.x -= deltaMaxX;
-    } else {
-      // collided top side first
-      entity1.y -= deltaMaxY;
-    }
-  }
-  // entity1 moving up/right
-  else if (entity1.moveX > 0 && entity1.moveY < 0) {
-    if (deltaMaxX < deltaMinY) {
-      // collided right side first
-      entity1.x -= deltaMaxX;
-    } else {
-      // collided bottom side first
-      entity1.y += deltaMinY;
-    }
-  }
-  // entity1 moving right
-  else if (entity1.moveX > 0) {
-    entity1.x -= deltaMaxX;
-  }
-  // entity1 moving down/left
-  else if (entity1.moveX < 0 && entity1.moveY > 0) {
-    if (deltaMinX < deltaMaxY) {
-      // collided left side first
-      entity1.x += deltaMinX;
-    } else {
-      // collided top side first
-      entity1.y -= deltaMaxY;
-    }
-  }
-  // entity1 moving up/left
-  else if (entity1.moveX < 0 && entity1.moveY < 0) {
-    if (deltaMinX < deltaMinY) {
-      // collided left side first
-      entity1.x += deltaMinX;
-    } else {
-      // collided bottom side first
-      entity1.y += deltaMinY;
-    }
-  }
-  // entity1 moving left
-  else if (entity1.moveX < 0) {
-    entity1.x += deltaMinX;
-  }
-  // entity1 moving down
-  else if (entity1.moveY > 0) {
-    entity1.y -= deltaMaxY;
-  }
-  // entity1 moving up
-  else if (entity1.moveY < 0) {
-    entity1.y += deltaMinY;
-  }
-};
-
-function constrainFlightToViewport(entity) {
+function constrainFlightToViewport() {
   const horizontallySorted = flight.sort((ship1, ship2) => ship1.x < ship2.x ? -1 : 1);
   const leftMost = horizontallySorted[0];
   const rightMost = horizontallySorted[horizontallySorted.length - 1];
@@ -257,11 +193,12 @@ function updateCameraWindow() {
   }
 };
 
-function createEntity(type, x = 0, y = 0) {
+function createEntity(type, collisionGroup, x = 0, y = 0) {
   const action = 'move';
   const sprite = ATLAS[type][action][0];
   return {
     action,
+    collisionGroup,
     fireTime: 0,
     fireCadence: ATLAS[type].fireCadence,
     frame: 0,
@@ -316,21 +253,9 @@ function updateEntityPositionAndAnimationFrame(entity) {
   }
   // update position
   const scale = entity.moveX && entity.moveY ? RADIUS_ONE_AT_45_DEG : 1;
-  if (!scale) {
-    console.log(entity.moveX, entity.moveY, entity.moveX && entity.moveY, RADIUS_ONE_AT_45_DEG, 1);
-    debugger;
-  }
   const distance = entity.speed * elapsedTime * scale;
-  if (!distance) {
-    console.log(entity.speed, elapsedTime, scale);
-    debugger;
-  }
   entity.x += distance * entity.moveX;
   entity.y += distance * entity.moveY;
-
-  if (hero.x < flight[1].x || hero.y > flight[1].y) {
-    debugger;
-  }
 };
 
 function fireBullet(entity) {
@@ -340,7 +265,7 @@ function fireBullet(entity) {
       entity.fireTime += elapsedTime;
       if (entity.fireTime >= entity.fireCadence) {
         entity.fireTime -= entity.fireCadence;
-        const bullet = createEntity('bullet', entity.x + entity.w / 2, entity.y - entity.h);
+        const bullet = createEntity('bullet', COLLISION_GROUP_FLIGHT, entity.x + entity.w / 2, entity.y - entity.h);
         // center bullet on the nose of the hero/wingfolk ship
         bullet.x -= bullet.w / 2;
         // always move up
@@ -370,9 +295,16 @@ function updateScrolling() {
 function spawnEnemy() {
   lastSpawnDuration += elapsedTime;
 
+  let type;
+
   if (rand() < lerp(0, 1, lastSpawnDuration / 30)) {
+    type = 'alien1';
+  } else if (rand() < lerp(0, 1, lastSpawnDuration / 40)) {
+    type = 'alien2';
+  }
+  if (type) {
     lastSpawnDuration = 0;
-    const alien = createEntity('alien1', viewportOffsetX + rand(0, VIEWPORT.width), viewportOffsetY);
+    const alien = createEntity(type, COLLISION_GROUP_ALIEN, viewportOffsetX + rand(0, VIEWPORT.width), viewportOffsetY);
     // start off screen
     alien.y -= alien.h;
     // always move down
@@ -390,19 +322,28 @@ function update() {
       entities.forEach(updateEntityPositionAndAnimationFrame);
       spawnEnemy();
       entities.forEach(fireBullet);
-      // TODO update for flight & bullets
-      entities.slice(1).forEach((entity) => {
-        const test = testAABBCollision(hero, entity);
-        if (test.collide) {
-          correctAABBCollision(hero, entity, test);
-        }
+      entities.forEach((entity1, i) => {
+        entities.slice(i + 1).forEach(entity2 => {
+          if (testAABBCollision(entity1, entity2)) {
+            entity1.dying = true;
+            entity2.dying = true;
+          }
+        });
       });
-      constrainFlightToViewport(hero);
+      constrainFlightToViewport();
       updateCameraWindow();
       // remove entities who have gone beyond the top of the screen plus 2 sprite height (for safety)
       // and the ones who got passed the bottom of the screen plus 1 sprite height (for safety)
       // NOTE: filter actually keeps the entities still in the viewport, discarding the ones to remove
-      entities = entities.filter(entity => (entity.y < viewportOffsetY + VIEWPORT.height + entity.h) && (entity.y > viewportOffsetY - 2*entity.h));
+      entities = entities.filter(entity => (
+        entity.y < viewportOffsetY + VIEWPORT.height + entity.h
+        && entity.y > viewportOffsetY - 2*entity.h
+        && !entity.dying
+      ));
+      flight = flight.filter(ship => !ship.dying);
+      if (!flight.length) {
+        screen = END_SCREEN;
+      }
       break;
   }
 };
