@@ -3,7 +3,7 @@ import { checkMonetization, isMonetizationEnabled, monetizationEarned } from './
 import { initSpeech } from './speech';
 import { save, load } from './storage';
 import { ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, CHARSET_SIZE, initCharset, renderText } from './text';
-import { getSeed, initRand, lerp, loadImg, rand, smoothLerpArray } from './utils';
+import { lerp, loadImg, rand, setRandSeed, smoothLerpArray } from './utils';
 import TILESET from '../img/tileset.webp';
 
 
@@ -481,7 +481,7 @@ onload = async (e) => {
   onresize();
   checkMonetization(unlockExtraContent);
 
-  // initRand(getSeed());
+  setRandSeed('gamedevjs2021');
   await initCharset(TEXT_CTX);
   tileset = await loadImg(TILESET);
   // speak = await initSpeech();
