@@ -270,7 +270,7 @@ function fireBullet(entity) {
   switch (entity.type) {
     case 'hero':
     case 'wingfolk':
-      entity.fireTime += elapsedTime;
+      entity.fireTime += hero.shooting || isMobile ? elapsedTime : 0;
       if (entity.fireTime >= entity.fireCadence) {
         entity.fireTime -= entity.fireCadence;
         const bullet = createEntity('bullet', COLLISION_GROUP_FLIGHT, entity.x + entity.w / 2, entity.y - entity.h);
@@ -568,6 +568,11 @@ function keyPressed(e) {
           case 'KeyS':
             hero.moveDown = currentTime;
             break;
+          case 'Space':
+            hero.shooting = currentTime;
+            // make each ship fire immediately
+            flight.forEach(ship => { ship.fireTime = ship.fireCadence });
+            break;
           case 'KeyM':
             invertImage = !invertImage;
             invertTime = currentTime;
@@ -631,7 +636,9 @@ function keyReleased(e) {
           }
           hero.moveDown = 0;
           break;
-        }
+        case 'Space':
+          hero.shooting = 0;
+      }
       break;
     case END_SCREEN:
       switch (e.code) {

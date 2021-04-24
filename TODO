@@ -6,10 +6,11 @@ game engine
   - [x] add enemy to shoot down
   - [x] actually shoot down the enemies
   - make enemy shoot
-  - shoot with space (except on mobile)
+  - [x] shoot with space (except on mobile)
   - [x] when hero destroyed, another ship in the flight takes over
-  - death animation
+  - death animation & tighten bounding box
   - fix tap control on end screen
+  - trigger mirror effect via level rather than key
   - level editor
   - add boss with reflecting mirror
   - keyboard control localization
