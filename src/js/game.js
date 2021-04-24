@@ -143,8 +143,9 @@ function startGame() {
   flight = [
     hero,
     createEntity('wingfolk', COLLISION_GROUP_FLIGHT, hero.x - hero.w, hero.y + hero.h),
-    createEntity('wingfolk', COLLISION_GROUP_FLIGHT, hero.x + hero.w, hero.y + 1.5*hero.h)
+    createEntity('wingfolk', COLLISION_GROUP_FLIGHT, hero.x + hero.w, hero.y + 1.5*hero.h),
   ];
+  flight.forEach((ship, i) => { ship.flightRank = i+1 });
   entities = [
     ...flight
   ];
@@ -329,8 +330,9 @@ function update() {
       entities.forEach((entity1, i) => {
         entities.slice(i + 1).forEach(entity2 => {
           if (testAABBCollision(entity1, entity2)) {
-            entity1.dying = true;
-            entity2.dying = true;
+            // TODO change action to 'dying' to play the explosion animation once
+            entity1.dead = true;
+            entity2.dead = true;
             score += 10;
           }
         });
@@ -343,15 +345,21 @@ function update() {
       entities = entities.filter(entity => (
         entity.y < viewportOffsetY + VIEWPORT.height + entity.h
         && entity.y > viewportOffsetY - 2*entity.h
-        && !entity.dying
+        && !entity.dead
       ));
-      flight = flight.filter(ship => !ship.dying);
+      flight = flight.filter(ship => !ship.dead);
       if (!flight.length) {
         if (score > highscore) {
           save('highscore', score);
           highscore = score;
         }
         screen = END_SCREEN;
+      }
+      else if (!flight.filter(ship => ship.type === 'hero').length) {
+        // flight leader was killed, promote the next wingfolk
+        hero = flight[0];
+        hero.type = 'hero';
+        speak(`Red ${hero.flightRank} assuming command!`);
       }
       break;
   }
@@ -504,7 +512,7 @@ onload = async (e) => {
   setRandSeed('gamedevjs2021');
   await initCharset(TEXT_CTX);
   tileset = await loadImg(TILESET);
-  // speak = await initSpeech();
+  speak = await initSpeech();
 
   // itch.io hack
   addEventListener('keydown', keyPressed);
