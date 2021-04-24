@@ -145,6 +145,9 @@ function startGame() {
     createEntity('wingfolk', COLLISION_GROUP_FLIGHT, hero.x - hero.w, hero.y + hero.h),
     createEntity('wingfolk', COLLISION_GROUP_FLIGHT, hero.x + hero.w, hero.y + 1.5*hero.h),
   ];
+  if (isMonetizationEnabled()) {
+    flight.push(createEntity('wingfolk', COLLISION_GROUP_FLIGHT, hero.x, hero.y + 2.5*hero.h));
+  }
   flight.forEach((ship, i) => { ship.flightRank = i+1 });
   entities = [
     ...flight
