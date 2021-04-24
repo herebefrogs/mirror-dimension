@@ -33,6 +33,7 @@ let highscore = load('highscore');
 
 const COLLISION_GROUP_FLIGHT = 1;
 const COLLISION_GROUP_ALIEN = 2;
+const COLLISION_GROUP_BULLET = 3;
 
 
 let speak;
@@ -81,7 +82,7 @@ const ATLAS = {
     { x: 32, y: 0, w: 16, h: 16 },
     { x: 32, y: 16, w: 16, h: 16 }
   ],
-  bullet: {
+  shipBullet: {
     move: [
       // flame #1 bullet
       { x: 48, y: 0, w: 4, h: 16 },
@@ -99,7 +100,8 @@ const ATLAS = {
       { x: 16, y: 32, w: 16, h: 16 },
       { x: 32, y: 32, w: 16, h: 16 }
     ],
-    speed: 25,
+    speed: 15,
+    fireCadence: 1,
   },
   alien2: {
     move: [
@@ -108,7 +110,18 @@ const ATLAS = {
       { x: 32, y: 48, w: 16, h: 16 },
       { x: 48, y: 48, w: 16, h: 16 }
     ],
-    speed: 25,
+    speed: 15,
+    fireCadence: 1.5,
+  },
+  alienBullet: {
+    move: [
+      // flame #1 bullet
+      { x: 48, y: 16, w: 8, h: 8 },
+      { x: 56, y: 16, w: 8, h: 8 },
+      { x: 56, y: 24, w: 8, h: 8 },
+      { x: 48, y: 24, w: 8, h: 8 },
+    ],
+    speed: 30,
   },
   scroll: {
     speed: {
@@ -273,11 +286,27 @@ function fireBullet(entity) {
       entity.fireTime += hero.shooting || isMobile ? elapsedTime : 0;
       if (entity.fireTime >= entity.fireCadence) {
         entity.fireTime -= entity.fireCadence;
-        const bullet = createEntity('bullet', COLLISION_GROUP_FLIGHT, entity.x + entity.w / 2, entity.y - entity.h);
+        const bullet = createEntity('shipBullet', COLLISION_GROUP_BULLET, entity.x + entity.w / 2, entity.y - entity.h);
         // center bullet on the nose of the hero/wingfolk ship
         bullet.x -= bullet.w / 2;
         // always move up
         bullet.moveY = -1;
+
+        // add bullets at the end, so they are drawn on top of other sprites
+        entities.push(bullet);
+      }
+      break;
+    case 'alien1':
+    case 'alien2':
+      entity.fireTime += elapsedTime;
+      if (entity.fireTime >= entity.fireCadence) {
+        entity.fireTime -= entity.fireCadence;
+        const bullet = createEntity('alienBullet', COLLISION_GROUP_BULLET, entity.x + entity.w / 2, entity.y + entity.h);
+        // center bullet on the nose of the hero/wingfolk ship
+        bullet.x -= bullet.w / 2;
+        // always move down
+        // TODO figure out the math to shoot at the leader
+        bullet.moveY = 1;
 
         // add bullets at the end, so they are drawn on top of other sprites
         entities.push(bullet);

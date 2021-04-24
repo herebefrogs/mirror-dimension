@@ -5,7 +5,7 @@ game engine
   - [x] add bullets
   - [x] add enemy to shoot down
   - [x] actually shoot down the enemies
-  - make enemy shoot
+  - [x] make enemy shoot
   - [x] shoot with space (except on mobile)
   - [x] when hero destroyed, another ship in the flight takes over
   - death animation & tighten bounding box
