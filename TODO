@@ -4,22 +4,24 @@ game engine
   - BUG: lead ship move sometimes when hammering controls -> debugger statements in place
   - [x] add bullets
   - [x] add enemy to shoot down
+  - [x] change lose condition to no more ship in flight
+  - [x] remove countdown
+  - [x] add inverted control (copy canvas flipped horizontally, text must be on a separate overlay)
   - [x] actually shoot down the enemies
   - [x] make enemy shoot
   - [x] shoot with space (except on mobile)
   - [x] when hero destroyed, another ship in the flight takes over
-  - death animation & tighten bounding box
-  - fix tap control on end screen
+  - enemy shoot at leader
+  - [x] tighten bounding box
+  - death animation
   - trigger mirror effect via level rather than key
   - level editor
   - add boss with reflecting mirror
+  - fix tap control on end screen
   - keyboard control localization
   - tweet score
   - music track
   - sound effect
-  - [x] change lose condition to no more ship in flight
-  - [x] remove countdown
-  - [x] add inverted control (copy canvas flipped horizontally, text must be on a separate overlay)
   - add boss hiding behing several mirrors, must hit the right one to destroy the mirror, boss defeated when no more mirror
   - (DEFER to affer jam) add terrain mirror
   - (DEFER to after jam) swap referential origin to bottom left

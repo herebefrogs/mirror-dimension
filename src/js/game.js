@@ -63,26 +63,35 @@ let viewportOffsetY = 0;
 
 const ATLAS = {
   hero: {
+    boundingBox: {
+      x: 4, y: 2, w: 8, h: 8
+    },
+    fireCadence: 0.2,    // seconds between shots
     move: [
       { x: 0, y: 0, w: 16, h: 16 },
       { x: 0, y: 16, w: 16, h: 16 }
     ],
-    speed: 45,
-    fireCadence: 0.2    // seconds between shots
+    speed: 45,           // pixels per second
   },
   wingfolk: {
+    boundingBox: {
+      x: 4, y: 2, w: 8, h: 8
+    },
+    fireCadence: 0.2,    // seconds between shots
     move: [
       { x: 16, y: 0, w: 16, h: 16 },
       { x: 16, y: 16, w: 16, h: 16 }
     ],
     speed: 45,
-    fireCadence: 0.2    // seconds between shots
   },
   shipShadow: [
     { x: 32, y: 0, w: 16, h: 16 },
     { x: 32, y: 16, w: 16, h: 16 }
   ],
   shipBullet: {
+    boundingBox: {
+      x: 0, y: 2, w: 4, h: 10
+    },
     move: [
       // flame #1 bullet
       { x: 48, y: 0, w: 4, h: 16 },
@@ -94,6 +103,10 @@ const ATLAS = {
     speed: 200,
   },
   alien1: {
+    boundingBox: {
+      x: 3, y: 2, w: 10, h: 10
+    },
+    fireCadence: 1,
     move: [
       { x: 48, y: 32, w: 16, h: 16 },
       { x: 0, y: 32, w: 16, h: 16 },
@@ -101,9 +114,12 @@ const ATLAS = {
       { x: 32, y: 32, w: 16, h: 16 }
     ],
     speed: 15,
-    fireCadence: 1,
   },
   alien2: {
+    boundingBox: {
+      x: 1, y: 3, w: 14, h: 10
+    },
+    fireCadence: 1.5,
     move: [
       { x: 0, y: 48, w: 16, h: 16 },
       { x: 16, y: 48, w: 16, h: 16 },
@@ -111,9 +127,11 @@ const ATLAS = {
       { x: 48, y: 48, w: 16, h: 16 }
     ],
     speed: 15,
-    fireCadence: 1.5,
   },
   alienBullet: {
+    boundingBox: {
+      x: 2, y: 2, w:4, h: 4
+    },
     move: [
       // flame #1 bullet
       { x: 48, y: 16, w: 8, h: 8 },
@@ -172,10 +190,10 @@ function startGame() {
 function testAABBCollision(entity1, entity2) {
   return (
     entity1.collisionGroup !== entity2.collisionGroup
-    && entity1.x < entity2.x + entity2.w
-    && entity1.x + entity1.w > entity2.x
-    && entity1.y < entity2.y + entity2.h
-    && entity1.y + entity1.h > entity2.y
+    && entity1.x + entity1.boundingBox.x < entity2.x + entity2.boundingBox.x + entity2.boundingBox.w
+    && entity1.x + entity1.boundingBox.x + entity1.boundingBox.w > entity2.x + entity2.boundingBox.x
+    && entity1.y + entity1.boundingBox.y < entity2.y + entity2.boundingBox.y + entity2.boundingBox.h
+    && entity1.y + entity1.boundingBox.y + entity1.boundingBox.h > entity2.y + entity2.boundingBox.y
   )
 };
 
@@ -219,6 +237,7 @@ function createEntity(type, collisionGroup, x = 0, y = 0) {
   const sprite = ATLAS[type][action][0];
   return {
     action,
+    boundingBox: ATLAS[type].boundingBox,
     collisionGroup,
     fireTime: 0,
     fireCadence: ATLAS[type].fireCadence,
@@ -496,6 +515,15 @@ function renderEntity(entity, ctx = VIEWPORT_CTX) {
     sprite.x, sprite.y, sprite.w, sprite.h,
     Math.round(entity.x - viewportOffsetX), Math.round(entity.y - viewportOffsetY), sprite.w, sprite.h
   );
+  // DEBUG render bounding box
+  // ctx.lineWidth = 1;
+  // ctx.strokeStyle = '#bad';
+  // ctx.strokeRect(
+  //   Math.round(entity.x - viewportOffsetX + entity.boundingBox.x),
+  //   Math.round(entity.y - viewportOffsetY + entity.boundingBox.y),
+  //   entity.boundingBox.w,
+  //   entity.boundingBox.h
+  // )
 };
 
 function renderMap() {
