@@ -5,6 +5,7 @@ import { save, load } from './storage';
 import { ALIGN_CENTER, ALIGN_RIGHT, CHARSET_SIZE, initCharset, renderText } from './text';
 import { lerp, loadImg, rand, setRandSeed, smoothLerpArray } from './utils';
 import TILESET from '../img/tileset.webp';
+import LEVELSET from '../../assets/level/png/Level_0_Tiles.png';
 
 
 const konamiCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
@@ -31,7 +32,7 @@ let lastSpawnDuration = 0;
 let score;
 let highscore = load('highscore');
 let lastMirrorTime;
-const MIRROR_DURATION = 10000;
+const MIRROR_DURATION = 15000;
 
 const COLLISION_GROUP_FLIGHT = 1;
 const COLLISION_GROUP_ALIEN = 2;
@@ -45,8 +46,8 @@ let speak;
 const CTX = c.getContext('2d');         // visible canvas
 const MAP = c.cloneNode();              // full map rendered off screen
 const MAP_CTX = MAP.getContext('2d');
-MAP.width = 280;                        // map size
-MAP.height = 360;
+MAP.width = 288;                        // map size
+MAP.height = 480;
 const TEXT = c.cloneNode();             // text overlay, same size as viewport
 const TEXT_CTX = TEXT.getContext('2d');
 const VIEWPORT = c.cloneNode();         // visible portion of map/viewport
@@ -194,6 +195,7 @@ const ATLAS = {
 
 const FRAME_DURATION = 0.1; // duration of 1 animation frame, in seconds
 let tileset;   // characters sprite, embedded as a base64 encoded dataurl by build script
+let levelset;
 
 // LOOP VARIABLES
 
@@ -528,7 +530,7 @@ function blit() {
 
 function render() {
   TEXT_CTX.clearRect(0, 0, TEXT.width, TEXT.height);
-  VIEWPORT_CTX.fillStyle = '#ccc';
+  VIEWPORT_CTX.fillStyle = '#000';
   VIEWPORT_CTX.fillRect(0, 0, VIEWPORT.width, VIEWPORT.height);
 
   switch (screen) {
@@ -539,7 +541,8 @@ function render() {
       renderText('mirЯ0Я', TEXT.width / 2, 8.6*CHARSET_SIZE, ALIGN_CENTER, 2);
       renderText('dimension', TEXT.width / 2, 11.2*CHARSET_SIZE, ALIGN_CENTER, 2);
       renderText(`${isMobile ? 'swipe' : 'wasd/UDLR'} to move`, TEXT.width / 2, TEXT.height / 2, ALIGN_CENTER);
-      renderText(`${isMobile ? 'tap' : '[enter]'} to start`, TEXT.width / 2, TEXT.height / 2 + 2.4 * CHARSET_SIZE, ALIGN_CENTER);
+      renderText(isMobile ? 'autofire on' : '[space] to fire', TEXT.width / 2, TEXT.height / 2 + 2.4 * CHARSET_SIZE, ALIGN_CENTER);
+      renderText(`${isMobile ? 'tap' : '[enter]'} to start`, TEXT.width / 2, TEXT.height / 2 + 4.8 * CHARSET_SIZE, ALIGN_CENTER);
       renderText('gamedev.js jam 2021', TEXT.width / 2, TEXT.height - 2* CHARSET_SIZE, ALIGN_CENTER);
       // if (konamiIndex === konamiCode.length) {
       //   renderText('konami mode on', TEXT.width - CHARSET_SIZE, CHARSET_SIZE, ALIGN_RIGHT);
@@ -618,17 +621,10 @@ function renderEntity(entity, ctx = VIEWPORT_CTX) {
 };
 
 function renderMap() {
-  MAP_CTX.clearRect(0, 0, MAP.width, MAP.height);
-
-  // skew the pattern vertically so the mirror effect does something
-  MAP_CTX.setTransform(1, 0.15, 0, 1, 0, 0);
-
-  MAP_CTX.fillStyle ='#777';
-  [-1, 0, 1, 2].forEach(i => {
-    MAP_CTX.fillRect(0, i*120, 70, 60);
-    MAP_CTX.fillRect(210, i*120, 70, 60);
-    MAP_CTX.fillRect(70, (2*i+1)*60, 140, 60);
-  })
+  MAP_CTX.drawImage(
+    levelset,
+    0, 0, MAP.width, MAP.height
+  )
 };
 
 // LOOP HANDLERS
@@ -666,6 +662,7 @@ onload = async (e) => {
   setRandSeed('gamedevjs2021');
   await initCharset(TEXT_CTX);
   tileset = await loadImg(TILESET);
+  levelset = await loadImg(LEVELSET);
   speak = await initSpeech();
 
   // itch.io hack

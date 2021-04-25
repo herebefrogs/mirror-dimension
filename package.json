@@ -6,12 +6,12 @@
   "scripts": {
     "clean": "rm -rf dist && mkdir dist",
     "build": "run-s clean build:*",
-    "build:js": "esbuild src/js/game.js --bundle --format=iife --loader:.webp=dataurl | terser --config-file scripts/terser.config.js -o dist/game.js",
+    "build:js": "esbuild src/js/game.js --bundle --format=iife --loader:.webp=dataurl --loader:.png=dataurl | terser --config-file scripts/terser.config.js -o dist/game.js",
     "build:html": "grep -v '<body' src/index.html | html-inline -b dist | html-minifier -c scripts/htmlmin.json -o dist/index.html",
     "build:zip": "zip -FS -qjX9 dist/game.zip dist/index.html && advzip -z -4 dist/game.zip",
     "build:zipSize": "node scripts/zipSize.js",
     "start": "npm-run-all -s clean -p dev:*",
-    "dev:js": "esbuild src/js/game.js --bundle --format=iife --loader:.webp=dataurl --sourcemap --outfile=dist/game.js --watch",
+    "dev:js": "esbuild src/js/game.js --bundle --format=iife --loader:.webp=dataurl --loader:.png=dataurl --sourcemap --outfile=dist/game.js --watch",
     "dev:serve_watch_html_js": "browser-sync 'dist' 'src' --watch --host 0.0.0.0 --https",
     "dev:watch_img": "chokidar src/img -d 0 -c 'npm run dev:js'"
   },

@@ -15,7 +15,7 @@ game engine
   - [x] tighten bounding box
   - [x] death animation
   - [x] trigger mirror effect via level rather than key
-  - level editor
+  - [x] level background (LDtk.io)
   - add boss with reflecting mirror
   - fix tap control on end screen
   - keyboard control localization
@@ -24,6 +24,7 @@ game engine
   - sound effect
   - animate alien shadows
   - add boss hiding behing several mirrors, must hit the right one to destroy the mirror, boss defeated when no more mirror
+  - (DEFER to affer jam) separate level tileset into its own Aseprite file
   - (DEFER to affer jam) add terrain mirror
   - (DEFER to after jam) swap referential origin to bottom left
 - lerp-smoothing?
