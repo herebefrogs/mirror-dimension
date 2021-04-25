@@ -30,6 +30,8 @@ let invertTime = 0;
 let lastSpawnDuration = 0;
 let score;
 let highscore = load('highscore');
+let lastMirrorTime;
+const MIRROR_DURATION = 10000;
 
 const COLLISION_GROUP_FLIGHT = 1;
 const COLLISION_GROUP_ALIEN = 2;
@@ -57,7 +59,6 @@ VIEWPORT.height = TEXT.height = 240;
 const CAMERA_WINDOW_X = 50;
 const CAMERA_WINDOW_Y = 50;
 const CAMERA_WINDOW_WIDTH = VIEWPORT.width - CAMERA_WINDOW_X;
-const CAMERA_WINDOW_HEIGHT = VIEWPORT.height - CAMERA_WINDOW_Y;
 let viewportOffsetX = 0;
 let viewportOffsetY = 0;
 
@@ -210,6 +211,9 @@ function unlockExtraContent() {
 function startGame() {
   konamiIndex = 0;
   score = 0;
+  invertImage = false;
+  invertTime = 0;
+  lastMirrorTime = currentTime;
   viewportOffsetX = (MAP.width - VIEWPORT.width) / 2;
   viewportOffsetY = MAP.height - VIEWPORT.height;
   // TODO the whole referentiel is off due to screen (0,0) being top left rather than bottom left
@@ -455,6 +459,11 @@ function update() {
       });
       constrainFlightToViewport();
       updateCameraWindow();
+      if (currentTime - lastMirrorTime > MIRROR_DURATION) {
+        lastMirrorTime += MIRROR_DURATION;
+        invertImage = !invertImage;
+        invertTime = currentTime;
+      }
       // remove entities who have gone beyond the top of the screen plus 2 sprite height (for safety)
       // and the ones who got passed the bottom of the screen plus 1 sprite height (for safety)
       // and the ones who are dead
@@ -490,7 +499,7 @@ function blit() {
   CTX.clearRect(0, 0, c.width, c.height);
   // copy backbuffer onto visible canvas, scaling it to screen dimensions
   CTX.save();
-  const t = (currentTime - invertTime) / 1000;
+  const t = (currentTime - invertTime) / 500;
   const scaleX = invertImage ? lerp(1, -1, t): lerp(-1, 1, t);
   const x = scaleX < 0 ? -c.width : 0;
   const tx = smoothLerpArray([0, c.width/2, 0], t);
@@ -530,8 +539,8 @@ function render() {
       // }
       break;
     case GAME_SCREEN:
-      renderText('score:', CHARSET_SIZE, CHARSET_SIZE);
-      renderText(`${score}`, TEXT.width - CHARSET_SIZE, CHARSET_SIZE, ALIGN_RIGHT);
+      renderText('score:', CHARSET_SIZE, TEXT.height - 2*CHARSET_SIZE);
+      renderText(`${score}`, TEXT.width - CHARSET_SIZE, TEXT.height - 2*CHARSET_SIZE, ALIGN_RIGHT);
       VIEWPORT_CTX.drawImage(
         MAP,
         // adjust x/y offset
@@ -543,17 +552,19 @@ function render() {
       // renderDebugTouch();
       entities.forEach(entity => renderReflection(entity));
       entities.forEach(entity => renderEntity(entity));
+      renderText(invertImage ? 'mirЯ0Я dimension!' : 'normal space...', TEXT.width / 2, CHARSET_SIZE, ALIGN_CENTER);
       break;
     case END_SCREEN:
-      renderText('highscore:', CHARSET_SIZE, CHARSET_SIZE);
-      renderText(`${highscore}`, TEXT.width - CHARSET_SIZE, CHARSET_SIZE, ALIGN_RIGHT);
-      renderText('your score:', CHARSET_SIZE, 3 * CHARSET_SIZE);
-      renderText(`${score}`, TEXT.width - CHARSET_SIZE, 3 * CHARSET_SIZE, ALIGN_RIGHT);
-      renderText('game over', TEXT.width / 2, TEXT.height / 2 - 2 * CHARSET_SIZE, ALIGN_CENTER, 2);
-      renderText(`${isMobile ? 'tap' : '[enter]'} to restart`, TEXT.width / 2, TEXT.height / 2 + CHARSET_SIZE, ALIGN_CENTER);
+      renderText('score:', CHARSET_SIZE, CHARSET_SIZE);
+      renderText(`${score}`, TEXT.width - CHARSET_SIZE, CHARSET_SIZE, ALIGN_RIGHT);
+
+      renderText('game over', TEXT.width / 2, TEXT.height / 2 - 4 * CHARSET_SIZE, ALIGN_CENTER, 2);
       if (isMonetizationEnabled()) {
-        renderText(`I earned ${monetizationEarned()}`, TEXT.width / 2, TEXT.height - CHARSET_SIZE, ALIGN_CENTER);
+        renderText(`thanks! i earned ${monetizationEarned()}`, TEXT.width / 2, TEXT.height / 2 - CHARSET_SIZE, ALIGN_CENTER);
       }
+      renderText(`${isMobile ? 'tap' : '[enter]'} to restart`, TEXT.width / 2, TEXT.height / 2 + 3*CHARSET_SIZE, ALIGN_CENTER);
+      renderText('highscore:', CHARSET_SIZE, TEXT.height - 2*CHARSET_SIZE);
+      renderText(`${highscore}`, TEXT.width - CHARSET_SIZE, TEXT.height - 2*CHARSET_SIZE, ALIGN_RIGHT);
       break;
   }
 
@@ -602,8 +613,11 @@ function renderEntity(entity, ctx = VIEWPORT_CTX) {
 function renderMap() {
   MAP_CTX.clearRect(0, 0, MAP.width, MAP.height);
 
+  // skew the pattern vertically so the mirror effect does something
+  MAP_CTX.setTransform(1, 0.15, 0, 1, 0, 0);
+
   MAP_CTX.fillStyle ='#777';
-  [0, 1, 2].forEach(i => {
+  [-1, 0, 1, 2].forEach(i => {
     MAP_CTX.fillRect(0, i*120, 70, 60);
     MAP_CTX.fillRect(210, i*120, 70, 60);
     MAP_CTX.fillRect(70, (2*i+1)*60, 140, 60);

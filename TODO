@@ -14,7 +14,7 @@ game engine
   - [x] enemy shoot at leader
   - [x] tighten bounding box
   - [x] death animation
-  - trigger mirror effect via level rather than key
+  - [x] trigger mirror effect via level rather than key
   - level editor
   - add boss with reflecting mirror
   - fix tap control on end screen
