@@ -573,6 +573,7 @@ function render() {
         renderText(`thanks! i earned ${monetizationEarned()}`, TEXT.width / 2, TEXT.height / 2 - CHARSET_SIZE, ALIGN_CENTER);
       }
       renderText(`${isMobile ? 'tap' : '[enter]'} to restart`, TEXT.width / 2, TEXT.height / 2 + 3*CHARSET_SIZE, ALIGN_CENTER);
+      renderText(isMobile ? '' : '[t]eet your score', TEXT.width / 2, TEXT.height / 2 + 4.6*CHARSET_SIZE, ALIGN_CENTER);
       renderText('highscore:', CHARSET_SIZE, TEXT.height - 2*CHARSET_SIZE);
       renderText(`${highscore}`, TEXT.width - CHARSET_SIZE, TEXT.height - 2*CHARSET_SIZE, ALIGN_RIGHT);
       break;
@@ -791,7 +792,7 @@ function keyReleased(e) {
     case END_SCREEN:
       switch (e.code) {
         case 'KeyT':
-          open(`https://twitter.com/intent/tweet?text=viral%20marketing%20message%20https%3A%2F%2Fgoo.gl%2F${'some tiny Google url here'}`, '_blank');
+          open(`https://twitter.com/intent/tweet?text=I%20scored%20${score}%20in%20The%20MIR%D0%AF0%D0%AF%20Dimension%20by%20%40herebefrogs%20for%20%23gamedevjs%202021%0Ahttps%3A%2F%2Fbit.ly%2Fmirrord`, '_blank');
           break;
         case 'Enter':
           startGame();

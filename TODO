@@ -19,10 +19,10 @@ game engine
   - add boss with reflecting mirror
   - fix tap control on end screen
   - keyboard control localization
-  - tweet score
+  - [x] tweet score
   - music track
   - sound effect
-  - animate alien shadows
+  - [x] animate alien shadows
   - add boss hiding behing several mirrors, must hit the right one to destroy the mirror, boss defeated when no more mirror
   - (DEFER to affer jam) separate level tileset into its own Aseprite file
   - (DEFER to affer jam) add terrain mirror
