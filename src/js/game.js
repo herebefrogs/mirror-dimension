@@ -373,9 +373,19 @@ function fireBullet(entity) {
           const bullet = createEntity('alienBullet', COLLISION_GROUP_BULLET, entity.x + entity.w / 2, entity.y + entity.h);
           // center bullet on the nose of the hero/wingfolk ship
           bullet.x -= bullet.w / 2;
-          // always move down
-          // TODO figure out the math to shoot at the leader
-          bullet.moveY = 1;
+
+          // prevent aliens from shooting backwards because they end up killing themselves with their own bullet
+          if (bullet.y < hero.y) {
+            // shoot at the leader
+            const hypotenuse = Math.sqrt(Math.pow(hero.x + hero.w/2 - bullet.x, 2) + Math.pow(hero.y + hero.h/2 - bullet.y, 2))
+            const adjacent = hero.x + hero.w/2 - bullet.x;
+            const opposite = hero.y + hero.h/2 - bullet.y;
+            bullet.moveY = opposite / hypotenuse;
+            bullet.moveX = adjacent / hypotenuse;
+          } else {
+            // always move down
+            bullet.moveY = 1;
+          }
 
           // add bullets at the end, so they are drawn on top of other sprites
           entities.push(bullet);
@@ -416,6 +426,8 @@ function spawnEnemy() {
     alien.y -= alien.h;
     // always move down
     alien.moveY = 1;
+    // make them fire sooner the first time
+    alien.fireTime = 0.4;
 
     entities.push(alien);
   }

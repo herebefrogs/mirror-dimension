@@ -11,7 +11,7 @@ game engine
   - [x] make enemy shoot
   - [x] shoot with space (except on mobile)
   - [x] when hero destroyed, another ship in the flight takes over
-  - enemy shoot at leader
+  - [x] enemy shoot at leader
   - [x] tighten bounding box
   - [x] death animation
   - trigger mirror effect via level rather than key
