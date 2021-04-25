@@ -13,7 +13,7 @@ game engine
   - [x] when hero destroyed, another ship in the flight takes over
   - enemy shoot at leader
   - [x] tighten bounding box
-  - death animation
+  - [x] death animation
   - trigger mirror effect via level rather than key
   - level editor
   - add boss with reflecting mirror
@@ -22,6 +22,7 @@ game engine
   - tweet score
   - music track
   - sound effect
+  - animate alien shadows
   - add boss hiding behing several mirrors, must hit the right one to destroy the mirror, boss defeated when no more mirror
   - (DEFER to affer jam) add terrain mirror
   - (DEFER to after jam) swap referential origin to bottom left

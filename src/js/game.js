@@ -67,9 +67,20 @@ const ATLAS = {
       x: 4, y: 2, w: 8, h: 8
     },
     fireCadence: 0.2,    // seconds between shots
+    dying: [
+      { x: 64, y: 0, w: 16, h: 16 },
+      { x: 0, y: 64, w: 16, h: 16 },
+      { x: 16, y: 64, w: 16, h: 16 },
+      { x: 32, y: 64, w: 16, h: 16 },
+      { x: 48, y: 64, w: 16, h: 16 }
+    ],
     move: [
       { x: 0, y: 0, w: 16, h: 16 },
       { x: 0, y: 16, w: 16, h: 16 }
+    ],
+    shadow: [
+      { x: 32, y: 0, w: 16, h: 16 },
+      { x: 32, y: 16, w: 16, h: 16 }
     ],
     speed: 45,           // pixels per second
   },
@@ -77,28 +88,34 @@ const ATLAS = {
     boundingBox: {
       x: 4, y: 2, w: 8, h: 8
     },
+    dying: [
+      { x: 64, y: 0, w: 16, h: 16 },
+      { x: 0, y: 64, w: 16, h: 16 },
+      { x: 16, y: 64, w: 16, h: 16 },
+      { x: 32, y: 64, w: 16, h: 16 },
+      { x: 48, y: 64, w: 16, h: 16 }
+    ],
     fireCadence: 0.2,    // seconds between shots
     move: [
       { x: 16, y: 0, w: 16, h: 16 },
       { x: 16, y: 16, w: 16, h: 16 }
     ],
+    shadow: [
+      { x: 32, y: 0, w: 16, h: 16 },
+      { x: 32, y: 16, w: 16, h: 16 }
+    ],
     speed: 45,
   },
-  shipShadow: [
-    { x: 32, y: 0, w: 16, h: 16 },
-    { x: 32, y: 16, w: 16, h: 16 }
-  ],
   shipBullet: {
     boundingBox: {
       x: 0, y: 2, w: 4, h: 10
     },
+    dying: [
+      { x: 56, y: 0, w: 4, h: 16 },
+    ],
     move: [
-      // flame #1 bullet
       { x: 48, y: 0, w: 4, h: 16 },
       { x: 52, y: 0, w: 4, h: 16 },
-      // flane #2
-      // { x: 56, y: 0, w: 4, h: 16 },
-      // { x: 60, y: 0, w: 4, h: 16 }
     ],
     speed: 200,
   },
@@ -106,6 +123,13 @@ const ATLAS = {
     boundingBox: {
       x: 3, y: 2, w: 10, h: 10
     },
+    dying: [
+      { x: 64, y: 32, w: 16, h: 16 },
+      { x: 0, y: 64, w: 16, h: 16 },
+      { x: 16, y: 64, w: 16, h: 16 },
+      { x: 32, y: 64, w: 16, h: 16 },
+      { x: 48, y: 64, w: 16, h: 16 }
+    ],
     fireCadence: 1,
     move: [
       { x: 48, y: 32, w: 16, h: 16 },
@@ -113,12 +137,25 @@ const ATLAS = {
       { x: 16, y: 32, w: 16, h: 16 },
       { x: 32, y: 32, w: 16, h: 16 }
     ],
+    shadow: [
+      { x: 64, y: 16, w: 16, h: 16 },
+      { x: 64, y: 16, w: 16, h: 16 },
+      { x: 64, y: 16, w: 16, h: 16 },
+      { x: 64, y: 16, w: 16, h: 16 },
+    ],
     speed: 15,
   },
   alien2: {
     boundingBox: {
       x: 1, y: 3, w: 14, h: 10
     },
+    dying: [
+      { x: 64, y: 48, w: 16, h: 16 },
+      { x: 0, y: 64, w: 16, h: 16 },
+      { x: 16, y: 64, w: 16, h: 16 },
+      { x: 32, y: 64, w: 16, h: 16 },
+      { x: 48, y: 64, w: 16, h: 16 }
+    ],
     fireCadence: 1.5,
     move: [
       { x: 0, y: 48, w: 16, h: 16 },
@@ -126,17 +163,23 @@ const ATLAS = {
       { x: 32, y: 48, w: 16, h: 16 },
       { x: 48, y: 48, w: 16, h: 16 }
     ],
+    shadow: [
+      { x: 64, y: 64, w: 16, h: 16 },
+      { x: 64, y: 64, w: 16, h: 16 },
+      { x: 64, y: 64, w: 16, h: 16 },
+      { x: 64, y: 64, w: 16, h: 16 },
+    ],
     speed: 15,
   },
   alienBullet: {
     boundingBox: {
       x: 2, y: 2, w:4, h: 4
     },
+    dying: [
+      { x: 52, y: 0, w: 4, h: 8 },
+    ],
     move: [
-      // flame #1 bullet
       { x: 48, y: 16, w: 8, h: 8 },
-      { x: 56, y: 16, w: 8, h: 8 },
-      { x: 56, y: 24, w: 8, h: 8 },
       { x: 48, y: 24, w: 8, h: 8 },
     ],
     speed: 30,
@@ -289,7 +332,13 @@ function updateEntityPositionAndAnimationFrame(entity) {
   if (entity.frameTime > FRAME_DURATION) {
     entity.frameTime -= FRAME_DURATION;
     entity.frame += 1;
-    entity.frame %= ATLAS[entity.type][entity.action].length;
+    const frameCount = ATLAS[entity.type][entity.action].length;
+    if (entity.action === 'dying' && entity.frame === frameCount) {
+      // dying animation only play once, mark entity for removal at end of loop
+      entity.dead = true;
+    } else {
+      entity.frame %= frameCount;
+    }
   }
   // update position
   const scale = entity.moveX && entity.moveY ? RADIUS_ONE_AT_45_DEG : 1;
@@ -299,38 +348,40 @@ function updateEntityPositionAndAnimationFrame(entity) {
 };
 
 function fireBullet(entity) {
-  switch (entity.type) {
-    case 'hero':
-    case 'wingfolk':
-      entity.fireTime += hero.shooting || isMobile ? elapsedTime : 0;
-      if (entity.fireTime >= entity.fireCadence) {
-        entity.fireTime -= entity.fireCadence;
-        const bullet = createEntity('shipBullet', COLLISION_GROUP_BULLET, entity.x + entity.w / 2, entity.y - entity.h);
-        // center bullet on the nose of the hero/wingfolk ship
-        bullet.x -= bullet.w / 2;
-        // always move up
-        bullet.moveY = -1;
+  if (entity.action !== 'dying') {
+    switch (entity.type) {
+      case 'hero':
+      case 'wingfolk':
+        entity.fireTime += hero.shooting || isMobile ? elapsedTime : 0;
+        if (entity.fireTime >= entity.fireCadence) {
+          entity.fireTime -= entity.fireCadence;
+          const bullet = createEntity('shipBullet', COLLISION_GROUP_BULLET, entity.x + entity.w / 2, entity.y - entity.h);
+          // center bullet on the nose of the hero/wingfolk ship
+          bullet.x -= bullet.w / 2;
+          // always move up
+          bullet.moveY = -1;
 
-        // add bullets at the end, so they are drawn on top of other sprites
-        entities.push(bullet);
-      }
-      break;
-    case 'alien1':
-    case 'alien2':
-      entity.fireTime += elapsedTime;
-      if (entity.fireTime >= entity.fireCadence) {
-        entity.fireTime -= entity.fireCadence;
-        const bullet = createEntity('alienBullet', COLLISION_GROUP_BULLET, entity.x + entity.w / 2, entity.y + entity.h);
-        // center bullet on the nose of the hero/wingfolk ship
-        bullet.x -= bullet.w / 2;
-        // always move down
-        // TODO figure out the math to shoot at the leader
-        bullet.moveY = 1;
+          // add bullets at the end, so they are drawn on top of other sprites
+          entities.push(bullet);
+        }
+        break;
+      case 'alien1':
+      case 'alien2':
+        entity.fireTime += elapsedTime;
+        if (entity.fireTime >= entity.fireCadence) {
+          entity.fireTime -= entity.fireCadence;
+          const bullet = createEntity('alienBullet', COLLISION_GROUP_BULLET, entity.x + entity.w / 2, entity.y + entity.h);
+          // center bullet on the nose of the hero/wingfolk ship
+          bullet.x -= bullet.w / 2;
+          // always move down
+          // TODO figure out the math to shoot at the leader
+          bullet.moveY = 1;
 
-        // add bullets at the end, so they are drawn on top of other sprites
-        entities.push(bullet);
-      }
-      break;
+          // add bullets at the end, so they are drawn on top of other sprites
+          entities.push(bullet);
+        }
+        break;
+    }
   }
 }
 
@@ -379,26 +430,30 @@ function update() {
       spawnEnemy();
       entities.forEach(fireBullet);
       entities.forEach((entity1, i) => {
-        entities.slice(i + 1).forEach(entity2 => {
-          if (testAABBCollision(entity1, entity2)) {
-            // TODO change action to 'dying' to play the explosion animation once
-            entity1.dead = true;
-            entity2.dead = true;
-            score += 10;
-          }
-        });
+        if (entity1.action !== 'dying') {
+          entities.slice(i + 1).forEach(entity2 => {
+            if (entity2.action !== 'dying' && testAABBCollision(entity1, entity2)) {
+              entity1.action = entity2.action = 'dying';
+              entity1.frame = entity2.frame = 0;
+              entity1.frameTime = entity2.frameTime = 0;
+              score += 10;
+            }
+          });
+        }
       });
       constrainFlightToViewport();
       updateCameraWindow();
       // remove entities who have gone beyond the top of the screen plus 2 sprite height (for safety)
       // and the ones who got passed the bottom of the screen plus 1 sprite height (for safety)
-      // NOTE: filter actually keeps the entities still in the viewport, discarding the ones to remove
+      // and the ones who are dead
+      // NOTE: filter actually keeps the entities still in the viewport and alive, discarding the ones to remove
       entities = entities.filter(entity => (
         entity.y < viewportOffsetY + VIEWPORT.height + entity.h
         && entity.y > viewportOffsetY - 2*entity.h
         && !entity.dead
       ));
       flight = flight.filter(ship => !ship.dead);
+      // check game over condition
       if (!flight.length) {
         if (score > highscore) {
           save('highscore', score);
@@ -406,8 +461,9 @@ function update() {
         }
         screen = END_SCREEN;
       }
+      // check if leader is dead
       else if (!flight.filter(ship => ship.type === 'hero').length) {
-        // flight leader was killed, promote the next wingfolk
+        // promote the next wingfolk as leader
         hero = flight[0];
         hero.type = 'hero';
         speak(`Red ${hero.flightRank} assuming command!`);
@@ -496,13 +552,18 @@ function renderReflection(entity, ctx = VIEWPORT_CTX) {
   switch(entity.type) {
     case 'hero':
     case 'wingfolk':
-      const sprite = ATLAS['shipShadow'][entity.frame];
-      // TODO skip draw if image outside of visible canvas
-      ctx.drawImage(
-        tileset,
-        sprite.x, sprite.y, sprite.w, sprite.h,
-        Math.round(entity.x - viewportOffsetX), Math.round(entity.y + 2 * entity.h - viewportOffsetY), sprite.w, sprite.h
-      );
+      // TODO uncomment once their shadows animated
+    // case 'alien1':
+    // case 'alien2':
+      if (entity.action !== 'dying' || entity.frame === 0) {
+        const sprite = ATLAS[entity.type]['shadow'][entity.frame];
+        // TODO skip draw if image outside of visible canvas
+        ctx.drawImage(
+          tileset,
+          sprite.x, sprite.y, sprite.w, sprite.h,
+          Math.round(entity.x - viewportOffsetX), Math.round(entity.y + entity.h - viewportOffsetY), sprite.w, sprite.h
+        );
+      }
       break;
   }
 }
