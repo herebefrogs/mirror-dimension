@@ -484,9 +484,16 @@ function update() {
       }
       // check if leader is dead
       else if (!flight.filter(ship => ship.type === 'hero').length) {
+        const newLeader = flight[0];
+        newLeader.type = 'hero';
+        // ensure continuity of keyboard/touch inputs
+        newLeader.moveDown = hero.moveDown;
+        newLeader.moveLeft = hero.moveLeft;
+        newLeader.moveRight = hero.moveRight;
+        newLeader.moveUp = hero.moveUp;
+        newLeader.shooting = hero.shooting;
         // promote the next wingfolk as leader
-        hero = flight[0];
-        hero.type = 'hero';
+        hero = newLeader;
         speak(`Red ${hero.flightRank} assuming command!`);
       }
       break;
