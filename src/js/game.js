@@ -140,10 +140,10 @@ const ATLAS = {
       { x: 32, y: 32, w: 16, h: 16 }
     ],
     shadow: [
-      { x: 64, y: 16, w: 16, h: 16 },
-      { x: 64, y: 16, w: 16, h: 16 },
-      { x: 64, y: 16, w: 16, h: 16 },
-      { x: 64, y: 16, w: 16, h: 16 },
+      { x: 48, y: 80, w: 16, h: 16 },
+      { x: 0, y: 80, w: 16, h: 16 },
+      { x: 16, y: 80, w: 16, h: 16 },
+      { x: 32, y: 80, w: 16, h: 16 },
     ],
     speed: 15,
   },
@@ -166,10 +166,10 @@ const ATLAS = {
       { x: 48, y: 48, w: 16, h: 16 }
     ],
     shadow: [
-      { x: 64, y: 64, w: 16, h: 16 },
-      { x: 64, y: 64, w: 16, h: 16 },
-      { x: 64, y: 64, w: 16, h: 16 },
-      { x: 64, y: 64, w: 16, h: 16 },
+      { x: 0, y: 96, w: 16, h: 16 },
+      { x: 16, y: 96, w: 16, h: 16 },
+      { x: 32, y: 96, w: 16, h: 16 },
+      { x: 48, y: 96, w: 16, h: 16 },
     ],
     speed: 15,
   },
@@ -429,7 +429,7 @@ function spawnEnemy() {
     lastSpawnDuration = 0;
     const alien = createEntity(type, COLLISION_GROUP_ALIEN, viewportOffsetX + rand(0, VIEWPORT.width), viewportOffsetY);
     // start off screen
-    alien.y -= alien.h;
+    alien.y -= 1.75*alien.h;
     // always move down
     alien.moveY = 1;
     // make them fire sooner the first time
@@ -586,8 +586,8 @@ function renderReflection(entity, ctx = VIEWPORT_CTX) {
     case 'hero':
     case 'wingfolk':
       // TODO uncomment once their shadows animated
-    // case 'alien1':
-    // case 'alien2':
+    case 'alien1':
+    case 'alien2':
       if (entity.action !== 'dying' || entity.frame === 0) {
         const sprite = ATLAS[entity.type]['shadow'][entity.frame];
         // TODO skip draw if image outside of visible canvas
