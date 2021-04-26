@@ -625,7 +625,11 @@ function renderEntity(entity, ctx = VIEWPORT_CTX) {
 function renderMap() {
   MAP_CTX.drawImage(
     levelset,
-    0, 0, MAP.width, MAP.height
+    0, 0, MAP.width, MAP.height / 2
+  )
+  MAP_CTX.drawImage(
+    levelset,
+    0, MAP.height / 2, MAP.width, MAP.height / 2
   )
 };
 
