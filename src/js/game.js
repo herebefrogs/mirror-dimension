@@ -573,7 +573,7 @@ function render() {
         renderText(`thanks! i earned ${monetizationEarned()}`, TEXT.width / 2, TEXT.height / 2 - CHARSET_SIZE, ALIGN_CENTER);
       }
       renderText(`${isMobile ? 'tap' : '[enter]'} to restart`, TEXT.width / 2, TEXT.height / 2 + 3*CHARSET_SIZE, ALIGN_CENTER);
-      renderText(isMobile ? '' : '[t]eet your score', TEXT.width / 2, TEXT.height / 2 + 4.6*CHARSET_SIZE, ALIGN_CENTER);
+      renderText(isMobile ? '' : '[t]weet your score', TEXT.width / 2, TEXT.height / 2 + 4.6*CHARSET_SIZE, ALIGN_CENTER);
       renderText('highscore:', CHARSET_SIZE, TEXT.height - 2*CHARSET_SIZE);
       renderText(`${highscore}`, TEXT.width - CHARSET_SIZE, TEXT.height - 2*CHARSET_SIZE, ALIGN_RIGHT);
       break;
