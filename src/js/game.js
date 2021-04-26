@@ -211,6 +211,7 @@ function unlockExtraContent() {
 }
 
 function startGame() {
+  setRandSeed('gamedevjs2021');
   konamiIndex = 0;
   score = 0;
   invertImage = false;
@@ -660,7 +661,6 @@ onload = async (e) => {
   onresize();
   checkMonetization(unlockExtraContent);
 
-  setRandSeed('gamedevjs2021');
   await initCharset(TEXT_CTX);
   tileset = await loadImg(TILESET);
   levelset = await loadImg(LEVELSET);
