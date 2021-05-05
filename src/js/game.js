@@ -207,9 +207,6 @@ let running = true;
 
 // GAMEPLAY HANDLERS
 
-function unlockExtraContent() {
-}
-
 function startGame() {
   setRandSeed('gamedevjs2021');
   konamiIndex = 0;
@@ -663,7 +660,7 @@ onload = async (e) => {
   document.title = 'The MIЯЯ0Я Dimension';
 
   onresize();
-  checkMonetization(unlockExtraContent);
+  checkMonetization();
 
   await initCharset(TEXT_CTX);
   tileset = await loadImg(TILESET);

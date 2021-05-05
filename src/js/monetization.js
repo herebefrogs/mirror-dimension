@@ -7,19 +7,20 @@ let currency = '';
 
 export const isMonetizationEnabled = () => monetizationEnabled;
 
-export const monetizationEarned = () => `${paid} ${currency}`;
+export const monetizationEarned = () => `${Math.round(paid * 100000) / 100000} ${currency.toLowerCase()}`;
 
 function disableMonetization() {
   // flag monetization as active
   monetizationEnabled = false;
-  // add listeners
-  document.monetization.addEventListener('monetizationstart', enableMonetization);
-  // clean up listener
-  document.monetization.removeEventListener('monetizationprogress', paymentCounter);
-  document.monetization.removeEventListener('monetizationstop', disableMonetization);
+}
+
+function enableMonetization() {
+  // flag monetization as active
+  monetizationEnabled = true;
 }
 
 function paymentCounter({ detail }) {
+  enableMonetization();
   paid += detail.amount / Math.pow(10, detail.assetScale);
   currency = detail.assetCode;
 }
@@ -29,26 +30,16 @@ function paymentCounter({ detail }) {
  * when web monetization has started (e.g. user is confirmed to be a Coil subscriber)
  * @params (*) callback function unlocking extra content warranted by the web monetization payments
  */
-export function checkMonetization(callback) {
-  function enableMonetization() {
-    // flag monetization as active
-    monetizationEnabled = true;
-    // add listeners
-    document.monetization.addEventListener('monetizationprogress', paymentCounter);
-    document.monetization.addEventListener('monetizationstop', disableMonetization);
-    // clean up listener
-    document.monetization.removeEventListener('monetizationstart', enableMonetization);
-    // trigger custom code
-    callback();
-  }
-
+export function checkMonetization() {
   if (document.monetization) {
     // check if Web Monetization has started
     if (document.monetization.state === 'started') {
       enableMonetization();
-    // or setup a listener for when Web Monetization has finished starting
-    } else if (document.monetization.state === 'pending') {
-      disableMonetization();
-    }
+    };
+
+    // setup a listener for when Web Monetization has finished starting
+    document.monetization.addEventListener('monetizationstart', enableMonetization);
+    document.monetization.addEventListener('monetizationprogress', paymentCounter);
+    document.monetization.addEventListener('monetizationstop', disableMonetization);
   }
 }
