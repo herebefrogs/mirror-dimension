@@ -4,7 +4,7 @@ import { initSpeech } from './speech';
 import { save, load } from './storage';
 import { ALIGN_CENTER, ALIGN_RIGHT, CHARSET_SIZE, initCharset, renderText } from './text';
 import { lerp, loadImg, rand, setRandSeed, smoothLerpArray } from './utils';
-import TILESET from '../img/tileset.webp';
+import TILESET from '../img/spritesheet.webp';
 import LEVELSET from '../../assets/level/png/Level_0_Tiles.png';
 
 
@@ -70,19 +70,19 @@ const ATLAS = {
     },
     fireCadence: 0.2,    // seconds between shots
     dying: [
-      { x: 64, y: 0, w: 16, h: 16 },
-      { x: 0, y: 64, w: 16, h: 16 },
-      { x: 16, y: 64, w: 16, h: 16 },
-      { x: 32, y: 64, w: 16, h: 16 },
-      { x: 48, y: 64, w: 16, h: 16 }
+      { x: 176, y: 0, w: 16, h: 16 },
+      { x: 208, y: 0, w: 16, h: 16 },
+      { x: 208, y: 16, w: 16, h: 16 },
+      { x: 128, y: 32, w: 16, h: 16 },
+      { x: 128, y: 48, w: 16, h: 16 }
     ],
     move: [
-      { x: 0, y: 0, w: 16, h: 16 },
-      { x: 0, y: 16, w: 16, h: 16 }
+      { x: 128, y: 0, w: 16, h: 16 },
+      { x: 128, y: 16, w: 16, h: 16 }
     ],
     shadow: [
-      { x: 32, y: 0, w: 16, h: 16 },
-      { x: 32, y: 16, w: 16, h: 16 }
+      { x: 160, y: 0, w: 16, h: 16 },
+      { x: 160, y: 16, w: 16, h: 16 }
     ],
     speed: 45,           // pixels per second
   },
@@ -91,20 +91,20 @@ const ATLAS = {
       x: 4, y: 2, w: 8, h: 8
     },
     dying: [
-      { x: 64, y: 0, w: 16, h: 16 },
-      { x: 0, y: 64, w: 16, h: 16 },
-      { x: 16, y: 64, w: 16, h: 16 },
-      { x: 32, y: 64, w: 16, h: 16 },
-      { x: 48, y: 64, w: 16, h: 16 }
+      { x: 176, y: 0, w: 16, h: 16 },
+      { x: 208, y: 0, w: 16, h: 16 },
+      { x: 208, y: 16, w: 16, h: 16 },
+      { x: 128, y: 32, w: 16, h: 16 },
+      { x: 128, y: 48, w: 16, h: 16 }
     ],
     fireCadence: 0.2,    // seconds between shots
     move: [
-      { x: 16, y: 0, w: 16, h: 16 },
-      { x: 16, y: 16, w: 16, h: 16 }
+      { x: 144, y: 0, w: 16, h: 16 },
+      { x: 144, y: 16, w: 16, h: 16 }
     ],
     shadow: [
-      { x: 32, y: 0, w: 16, h: 16 },
-      { x: 32, y: 16, w: 16, h: 16 }
+      { x: 160, y: 0, w: 16, h: 16 },
+      { x: 160, y: 16, w: 16, h: 16 }
     ],
     speed: 45,
   },
@@ -113,11 +113,11 @@ const ATLAS = {
       x: 0, y: 2, w: 4, h: 10
     },
     dying: [
-      { x: 56, y: 0, w: 4, h: 16 },
+      { x: 196, y: 0, w: 4, h: 16 },
     ],
     move: [
-      { x: 48, y: 0, w: 4, h: 16 },
-      { x: 52, y: 0, w: 4, h: 16 },
+      { x: 192, y: 0, w: 4, h: 16 },
+      { x: 192, y: 16, w: 4, h: 16 },
     ],
     speed: 200,
   },
@@ -126,18 +126,20 @@ const ATLAS = {
       x: 3, y: 2, w: 10, h: 10
     },
     dying: [
-      { x: 64, y: 32, w: 16, h: 16 },
-      { x: 0, y: 64, w: 16, h: 16 },
-      { x: 16, y: 64, w: 16, h: 16 },
-      { x: 32, y: 64, w: 16, h: 16 },
-      { x: 48, y: 64, w: 16, h: 16 }
+      { x: 48, y: 0, w: 16, h: 16 },
+      { x: 208, y: 0, w: 16, h: 16 },
+      { x: 208, y: 16, w: 16, h: 16 },
+      { x: 128, y: 32, w: 16, h: 16 },
+      { x: 128, y: 48, w: 16, h: 16 }
     ],
     fireCadence: 1,
     move: [
-      { x: 48, y: 32, w: 16, h: 16 },
-      { x: 0, y: 32, w: 16, h: 16 },
-      { x: 16, y: 32, w: 16, h: 16 },
-      { x: 32, y: 32, w: 16, h: 16 }
+      { x: 32, y: 0, w: 16, h: 16 },
+      { x: 32, y: 16, w: 16, h: 16 },
+      { x: 32, y: 32, w: 16, h: 16 },
+      { x: 32, y: 48, w: 16, h: 16 },
+      { x: 32, y: 64, w: 16, h: 16 },
+      { x: 32, y: 80, w: 16, h: 16 }
     ],
     shadow: [
       { x: 48, y: 80, w: 16, h: 16 },
@@ -152,18 +154,20 @@ const ATLAS = {
       x: 1, y: 3, w: 14, h: 10
     },
     dying: [
-      { x: 64, y: 48, w: 16, h: 16 },
-      { x: 0, y: 64, w: 16, h: 16 },
-      { x: 16, y: 64, w: 16, h: 16 },
-      { x: 32, y: 64, w: 16, h: 16 },
-      { x: 48, y: 64, w: 16, h: 16 }
+      { x: 80, y: 0, w: 16, h: 16 },
+      { x: 208, y: 0, w: 16, h: 16 },
+      { x: 208, y: 16, w: 16, h: 16 },
+      { x: 128, y: 32, w: 16, h: 16 },
+      { x: 128, y: 48, w: 16, h: 16 }
     ],
     fireCadence: 1.5,
     move: [
-      { x: 0, y: 48, w: 16, h: 16 },
-      { x: 16, y: 48, w: 16, h: 16 },
-      { x: 32, y: 48, w: 16, h: 16 },
-      { x: 48, y: 48, w: 16, h: 16 }
+      { x: 64, y: 0, w: 16, h: 16 },
+      { x: 64, y: 16, w: 16, h: 16 },
+      { x: 64, y: 32, w: 16, h: 16 },
+      { x: 64, y: 48, w: 16, h: 16 },
+      { x: 64, y: 64, w: 16, h: 16 },
+      { x: 64, y: 80, w: 16, h: 16 }
     ],
     shadow: [
       { x: 0, y: 96, w: 16, h: 16 },
@@ -178,11 +182,11 @@ const ATLAS = {
       x: 2, y: 2, w:4, h: 4
     },
     dying: [
-      { x: 52, y: 0, w: 4, h: 8 },
+      { x: 200, y: 0, w: 4, h: 8 },
     ],
     move: [
-      { x: 48, y: 16, w: 8, h: 8 },
-      { x: 48, y: 24, w: 8, h: 8 },
+      { x: 200, y: 0, w: 8, h: 8 },
+      { x: 200, y: 16, w: 8, h: 8 },
     ],
     speed: 30,
   },
@@ -585,8 +589,8 @@ function renderReflection(entity, ctx = VIEWPORT_CTX) {
     case 'hero':
     case 'wingfolk':
       // TODO uncomment once their shadows animated
-    case 'alien1':
-    case 'alien2':
+    // case 'alien1':
+    // case 'alien2':
       if (entity.action !== 'dying' || entity.frame === 0) {
         const sprite = ATLAS[entity.type]['shadow'][entity.frame];
         // TODO skip draw if image outside of visible canvas
