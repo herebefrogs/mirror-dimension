@@ -1,36 +1,42 @@
-game engine
-===========
-- an (ambitious) game
-  - BUG: lead ship move sometimes when hammering controls -> debugger statements in place
-  - [x] add bullets
-  - [x] add enemy to shoot down
-  - [x] change lose condition to no more ship in flight
-  - [x] remove countdown
-  - [x] add inverted control (copy canvas flipped horizontally, text must be on a separate overlay)
-  - [x] actually shoot down the enemies
-  - [x] make enemy shoot
-  - [x] shoot with space (except on mobile)
-  - [x] when hero destroyed, another ship in the flight takes over
-  - [x] enemy shoot at leader
-  - [x] tighten bounding box
-  - [x] death animation
-  - [x] trigger mirror effect via level rather than key
-  - [x] level background (LDtk.io)
-  - add boss with reflecting mirror
-  - fix tap control on end screen
-  - keyboard control localization
-  - [x] tweet score
+game
+  - hit points for alien ships
+  - different firing strategies for alien ships
+  - more alien ships
+  - better alien shadows sprite
+  - static level via LDtk.io
+  - level boss
+    - protected by rotating and reflective mirrors
+    - hidden behind one of the mirror, must hit the right mirror
+     (or else what?) until no more hiding place (L's idea)
+  - better entering of mirror dimension (diamond shape initiating from lead ship)
+  - actually different mirror dimension
+    - visually
+    - different enemy waves
   - music track
   - sound effect
-  - [x] animate alien shadows
-  - add boss hiding behing several mirrors, must hit the right one to destroy the mirror, boss defeated when no more mirror
-  - (DEFER to affer jam) separate level tileset into its own Aseprite file
-  - (DEFER to affer jam) add terrain mirror
-  - (DEFER to after jam) swap referential origin to bottom left
+  - keyboard control localization
 - lerp-smoothing?
 - gamepad support?
 - support multiple voices for speech synthesis?
 
+tech debt
+=========
+  - rename boundingBox to hitBox
+  - rethink viewportOffset... should only be for drawing stuff, not for any math
+    -> so maybe the viewport is scrolling up instead of the whole world moving down
+    (or is it actually this way and would make more sense the other way around?)
+    ((math is hard and make my head hurt))
+    (((big)))
+  - swap referential origin to bottom left (big)
+
+
 bugs
 ====
-zzfx (top.AudioContext || webkitAudioContext) fails to load on Itch.io (Blocked a frame with origin "https://v6p9d9t4.ssl.hwcdn.net" from accessing a cross-origin frame.)
+- font is all garbled on some player screens
+  (can't make it happen maybe a windows thing?)
+  ((scale canvas in multiples of font size??))
+- key event listener don't always trigger on first load
+  -> probably caused by iframe, install them on document instead?
+- fix tap control on end screen restarting the game as soon as finger lifted
+- lead ship "strafe" if promoted while in the edge-snapping area
+
