@@ -36,8 +36,6 @@ bugs
 - font is all garbled on some player screens
   (can't make it happen maybe a windows thing?)
   ((scale canvas in multiples of font size??))
-- key event listener don't always trigger on first load
-  -> probably caused by iframe, install them on document instead?
 - fix tap control on end screen restarting the game as soon as finger lifted
 - lead ship "strafe" if promoted while in the edge-snapping area
 

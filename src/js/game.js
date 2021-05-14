@@ -671,10 +671,6 @@ onload = async (e) => {
   levelset = await loadImg(LEVELSET);
   speak = await initSpeech();
 
-  // itch.io hack
-  addEventListener('keydown', keyPressed);
-  addEventListener('keyup', keyReleased);
-
   toggleLoop(true);
 };
 
@@ -685,6 +681,8 @@ onresize = onrotate = function() {
   c.height = VIEWPORT.height * scaleToFit;
   // disable smoothing on image scaling
   CTX.imageSmoothingEnabled = MAP_CTX.imageSmoothingEnabled = TEXT_CTX.imageSmoothingEnabled = VIEWPORT_CTX.imageSmoothingEnabled = false;
+  // fix key events not received on itch.io when game loads in full screen
+  window.focus();
 };
 
 // UTILS
@@ -696,7 +694,7 @@ document.onvisibilitychange = function(e) {
 
 // INPUT HANDLERS
 
-function keyPressed(e) {
+onkeydown = function(e) {
   // prevent itch.io from scrolling the page up/down
   e.preventDefault();
 
@@ -741,7 +739,7 @@ function keyPressed(e) {
   }
 };
 
-function keyReleased(e) {
+onkeyup = function(e) {
   switch (screen) {
     case TITLE_SCREEN:
       switch (e.code) {
