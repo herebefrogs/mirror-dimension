@@ -1,6 +1,6 @@
 game
   - hit points for alien ships
-  - different firing strategies for alien ships
+  - different firing/motion strategies for alien ships
   - more alien ships
   - better alien shadows sprite
   - static level via LDtk.io
@@ -14,6 +14,8 @@ game
     - different enemy waves
   - music track
   - sound effect
+  - less creepy speech synthesis
+  - actual squadron AI autonomy
   - keyboard control localization
 - lerp-smoothing?
 - gamepad support?
@@ -21,7 +23,6 @@ game
 
 tech debt
 =========
-  - rename boundingBox to hitBox
   - rethink viewportOffset... should only be for drawing stuff, not for any math
     -> so maybe the viewport is scrolling up instead of the whole world moving down
     (or is it actually this way and would make more sense the other way around?)
