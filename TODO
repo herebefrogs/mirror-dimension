@@ -1,4 +1,13 @@
+bugs
+====
+- font is all garbled on some player screens
+  (can't make it happen maybe a windows thing?)
+  ((scale canvas in multiples of font size??))
+- fix tap control on end screen restarting the game as soon as finger lifted
+- lead ship "strafe" if promoted while in the edge-snapping area
+
 game
+====
   - hit points for alien ships
   - different firing/motion strategies for alien ships
   - more alien ships
@@ -23,19 +32,11 @@ game
 
 tech debt
 =========
+  - rename wingfolks to wingman and flight to squadron
   - rethink viewportOffset... should only be for drawing stuff, not for any math
     -> so maybe the viewport is scrolling up instead of the whole world moving down
     (or is it actually this way and would make more sense the other way around?)
     ((math is hard and make my head hurt))
     (((big)))
   - swap referential origin to bottom left (big)
-
-
-bugs
-====
-- font is all garbled on some player screens
-  (can't make it happen maybe a windows thing?)
-  ((scale canvas in multiples of font size??))
-- fix tap control on end screen restarting the game as soon as finger lifted
-- lead ship "strafe" if promoted while in the edge-snapping area
 

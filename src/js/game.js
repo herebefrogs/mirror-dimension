@@ -34,9 +34,8 @@ let highscore = load('highscore');
 let lastMirrorTime;
 const MIRROR_DURATION = 15000;
 
-const COLLISION_GROUP_FLIGHT = 1;
-const COLLISION_GROUP_ALIEN = 2;
-const COLLISION_GROUP_BULLET = 3;
+const COLLISION_GROUP_HUMANS = 1;
+const COLLISION_GROUP_ALIENS = 2;
 
 
 let speak;
@@ -221,14 +220,39 @@ function startGame() {
   viewportOffsetX = (MAP.width - VIEWPORT.width) / 2;
   viewportOffsetY = MAP.height - VIEWPORT.height;
   // TODO the whole referentiel is off due to screen (0,0) being top left rather than bottom left
-  hero = createEntity('hero', COLLISION_GROUP_FLIGHT, MAP.width / 2, MAP.height - 3*ATLAS.hero.move[0].h);
+  hero = createEntity({
+    type: 'hero',
+    collisionGroup: COLLISION_GROUP_HUMANS,
+    collideWith: COLLISION_GROUP_ALIENS,
+    x: MAP.width / 2,
+    y: MAP.height - 3*ATLAS.hero.move[0].h
+  });
   flight = [
     hero,
-    createEntity('wingfolk', COLLISION_GROUP_FLIGHT, hero.x - hero.w, hero.y + hero.h),
-    createEntity('wingfolk', COLLISION_GROUP_FLIGHT, hero.x + hero.w, hero.y + 1.5*hero.h),
+    createEntity({
+      type: 'wingfolk',
+      collisionGroup: COLLISION_GROUP_HUMANS,
+      collideWith: COLLISION_GROUP_ALIENS,
+      x: hero.x - hero.w,
+      y: hero.y + hero.h
+    }),
+    createEntity({
+      type: 'wingfolk',
+      collisionGroup: COLLISION_GROUP_HUMANS,
+      collideWith: COLLISION_GROUP_ALIENS,
+      x: hero.x + hero.w,
+      y: hero.y + hero.h
+    }),
   ];
   if (isMonetizationEnabled()) {
-    flight.push(createEntity('wingfolk', COLLISION_GROUP_FLIGHT, hero.x + 2*hero.w, hero.y + 2.5*hero.h));
+    flight.splice(1, 0, createEntity({
+      type: 'wingfolk',
+      collisionGroup: COLLISION_GROUP_HUMANS,
+      collideWith: COLLISION_GROUP_ALIENS,
+      x: hero.x,
+      y: hero.y + 2.25*hero.h
+    }));
+    hero.y -= 0.25*hero.h;
   }
   flight.forEach((ship, i) => { ship.flightRank = i+1 });
   entities = [
@@ -240,7 +264,8 @@ function startGame() {
 
 function testAABBCollision(entity1, entity2) {
   return (
-    entity1.collisionGroup !== entity2.collisionGroup
+    (entity1.collideWith === entity2.collisionGroup
+     || entity1.collisionGroup === entity2.collideWith)
     && entity1.x + entity1.hitBox.x < entity2.x + entity2.hitBox.x + entity2.hitBox.w
     && entity1.x + entity1.hitBox.x + entity1.hitBox.w > entity2.x + entity2.hitBox.x
     && entity1.y + entity1.hitBox.y < entity2.y + entity2.hitBox.y + entity2.hitBox.h
@@ -283,13 +308,11 @@ function updateCameraWindow() {
   }
 };
 
-function createEntity(type, collisionGroup, x = 0, y = 0) {
-  const action = 'move';
+function createEntity({ action = 'move', type, x = 0, y = 0, ...options }) {
   const sprite = ATLAS[type][action][0];
   return {
     action,
     hitBox: ATLAS[type].hitBox,
-    collisionGroup,
     fireTime: 0,
     fireCadence: ATLAS[type].fireCadence,
     frame: 0,
@@ -306,6 +329,7 @@ function createEntity(type, collisionGroup, x = 0, y = 0) {
     w: sprite.w,
     x,
     y,
+    ...options
   };
 };
 
@@ -363,11 +387,16 @@ function fireBullet(entity) {
         entity.fireTime += hero.shooting || isMobile ? elapsedTime : 0;
         if (entity.fireTime >= entity.fireCadence) {
           entity.fireTime -= entity.fireCadence;
-          const bullet = createEntity('shipBullet', COLLISION_GROUP_BULLET, entity.x + entity.w / 2, entity.y - entity.h);
+          const bullet = createEntity({
+            type: 'shipBullet',
+            collideWith: COLLISION_GROUP_ALIENS,
+            // always move up
+            moveY: -1,
+            x: entity.x + entity.w / 2,
+            y: entity.y - entity.h
+          });
           // center bullet on the nose of the hero/wingfolk ship
           bullet.x -= bullet.w / 2;
-          // always move up
-          bullet.moveY = -1;
 
           // add bullets at the end, so they are drawn on top of other sprites
           entities.push(bullet);
@@ -378,22 +407,23 @@ function fireBullet(entity) {
         entity.fireTime += elapsedTime;
         if (entity.fireTime >= entity.fireCadence) {
           entity.fireTime -= entity.fireCadence;
-          const bullet = createEntity('alienBullet', COLLISION_GROUP_BULLET, entity.x + entity.w / 2, entity.y + entity.h);
-          // center bullet on the nose of the hero/wingfolk ship
+          const bullet = createEntity({
+            type: 'alienBullet',
+            collideWith: COLLISION_GROUP_HUMANS,
+            x: entity.x + entity.w / 2,
+            y: entity.y + entity.h
+          });
+          // center bullet on the nose of the alien ship
           bullet.x -= bullet.w / 2;
 
-          // prevent aliens from shooting backwards because they end up killing themselves with their own bullet
-          if (bullet.y < hero.y) {
-            // shoot at the leader
-            const hypotenuse = Math.sqrt(Math.pow(hero.x + hero.w/2 - bullet.x, 2) + Math.pow(hero.y + hero.h/2 - bullet.y, 2))
-            const adjacent = hero.x + hero.w/2 - bullet.x;
-            const opposite = hero.y + hero.h/2 - bullet.y;
-            bullet.moveY = opposite / hypotenuse;
-            bullet.moveX = adjacent / hypotenuse;
-          } else {
-            // always move down
-            bullet.moveY = 1;
-          }
+          // shoot at the leader
+          const heroX = hero.x + hero.w/2;
+          const heroY = hero.y + hero.h/2;
+          const hypotenuse = Math.sqrt(Math.pow(heroX - bullet.x, 2) + Math.pow(heroY - bullet.y, 2))
+          const adjacent = heroX - bullet.x;
+          const opposite = heroY - bullet.y;
+          bullet.moveY = opposite / hypotenuse;
+          bullet.moveX = adjacent / hypotenuse;
 
           // add bullets at the end, so they are drawn on top of other sprites
           entities.push(bullet);
@@ -429,13 +459,19 @@ function spawnEnemy() {
   }
   if (type) {
     lastSpawnDuration = 0;
-    const alien = createEntity(type, COLLISION_GROUP_ALIEN, viewportOffsetX + rand(0, VIEWPORT.width), viewportOffsetY);
+    const alien = createEntity({
+      type,
+      collisionGroup: COLLISION_GROUP_ALIENS,
+      collideWith: COLLISION_GROUP_HUMANS,
+      // make them fire sooner the first time
+      fireTime: 0.4,
+      // always move down
+      moveY: 1,
+      x: viewportOffsetX + rand(0, VIEWPORT.width),
+      y: viewportOffsetY
+    });
     // start off screen
     alien.y -= 1.75*alien.h;
-    // always move down
-    alien.moveY = 1;
-    // make them fire sooner the first time
-    alien.fireTime = 0.4;
 
     entities.push(alien);
   }
