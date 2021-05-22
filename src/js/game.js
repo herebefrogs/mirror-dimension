@@ -83,7 +83,7 @@ const ATLAS = {
       { x: 160, y: 0, w: 16, h: 16 },
       { x: 160, y: 16, w: 16, h: 16 }
     ],
-    speed: 45,           // pixels per second
+    speed: 48,           // pixels per second
   },
   wingfolk: {
     hitBox: {
@@ -105,7 +105,7 @@ const ATLAS = {
       { x: 160, y: 0, w: 16, h: 16 },
       { x: 160, y: 16, w: 16, h: 16 }
     ],
-    speed: 45,
+    speed: 48,
   },
   shipBullet: {
     hitBox: {
@@ -187,7 +187,7 @@ const ATLAS = {
       { x: 200, y: 0, w: 8, h: 8 },
       { x: 200, y: 16, w: 8, h: 8 },
     ],
-    speed: 30,
+    speed: 45,
   },
   scroll: {
     speed: {
@@ -416,9 +416,9 @@ function fireBullet(entity) {
           // center bullet on the nose of the alien ship
           bullet.x -= bullet.w / 2;
 
-          // shoot at the leader
+          // shoot in front of the leader
           const heroX = hero.x + hero.w/2;
-          const heroY = hero.y + hero.h/2;
+          const heroY = hero.y - 2*hero.h;
           const hypotenuse = Math.sqrt(Math.pow(heroX - bullet.x, 2) + Math.pow(heroY - bullet.y, 2))
           const adjacent = heroX - bullet.x;
           const opposite = heroY - bullet.y;
