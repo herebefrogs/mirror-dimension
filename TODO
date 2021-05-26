@@ -3,13 +3,14 @@ bugs
 - font is all garbled on some player screens
   (can't make it happen maybe a windows thing?)
   ((scale canvas in multiples of font size??))
+- sometime speech synthesis is late or don't play at all (cache all possible utterance ahead of time)
 - fix tap control on end screen restarting the game as soon as finger lifted
 - lead ship "strafe" if promoted while in the edge-snapping area
 
 game
 ====
-  - hit points for alien ships
   - different firing/motion strategies for alien ships
+  - experiment with speech synthesis
   - more alien ships
   - better alien shadows sprite
   - static level via LDtk.io
@@ -17,7 +18,7 @@ game
     - protected by rotating and reflective mirrors
     - hidden behind one of the mirror, must hit the right mirror
      (or else what?) until no more hiding place (L's idea)
-  - better entering of mirror dimension (diamond shape initiating from lead ship)
+  - better entering of mirror dimension (diamond shape initiating from lead ship) -> disable until then
   - actually different mirror dimension
     - visually
     - different enemy waves

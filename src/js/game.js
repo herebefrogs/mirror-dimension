@@ -69,11 +69,14 @@ const ATLAS = {
     },
     fireCadence: 0.2,    // seconds between shots
     dying: [
-      { x: 176, y: 0, w: 16, h: 16 },
       { x: 208, y: 0, w: 16, h: 16 },
       { x: 208, y: 16, w: 16, h: 16 },
       { x: 128, y: 32, w: 16, h: 16 },
       { x: 128, y: 48, w: 16, h: 16 }
+    ],
+    hit: [
+      { x: 176, y: 0, w: 16, h: 16 },
+      { x: 176, y: 16, w: 16, h: 16 }
     ],
     move: [
       { x: 128, y: 0, w: 16, h: 16 },
@@ -90,13 +93,16 @@ const ATLAS = {
       x: 4, y: 2, w: 8, h: 8
     },
     dying: [
-      { x: 176, y: 0, w: 16, h: 16 },
       { x: 208, y: 0, w: 16, h: 16 },
       { x: 208, y: 16, w: 16, h: 16 },
       { x: 128, y: 32, w: 16, h: 16 },
       { x: 128, y: 48, w: 16, h: 16 }
     ],
     fireCadence: 0.2,    // seconds between shots
+    hit: [
+      { x: 176, y: 0, w: 16, h: 16 },
+      { x: 176, y: 16, w: 16, h: 16 }
+    ],
     move: [
       { x: 144, y: 0, w: 16, h: 16 },
       { x: 144, y: 16, w: 16, h: 16 }
@@ -108,11 +114,13 @@ const ATLAS = {
     speed: 48,
   },
   shipBullet: {
+    dying: [],
     hitBox: {
       x: 0, y: 2, w: 4, h: 10
     },
-    dying: [
+    hit: [
       { x: 196, y: 0, w: 4, h: 16 },
+      { x: 196, y: 16, w: 4, h: 16 }
     ],
     move: [
       { x: 192, y: 0, w: 4, h: 16 },
@@ -125,13 +133,20 @@ const ATLAS = {
       x: 3, y: 2, w: 10, h: 10
     },
     dying: [
-      { x: 48, y: 0, w: 16, h: 16 },
       { x: 208, y: 0, w: 16, h: 16 },
       { x: 208, y: 16, w: 16, h: 16 },
       { x: 128, y: 32, w: 16, h: 16 },
       { x: 128, y: 48, w: 16, h: 16 }
     ],
     fireCadence: 1,
+    hit: [
+      { x: 48, y: 0, w: 16, h: 16 },
+      { x: 48, y: 16, w: 16, h: 16 },
+      { x: 48, y: 32, w: 16, h: 16 },
+      { x: 48, y: 48, w: 16, h: 16 },
+      { x: 48, y: 64, w: 16, h: 16 },
+      { x: 48, y: 80, w: 16, h: 16 }
+    ],
     move: [
       { x: 32, y: 0, w: 16, h: 16 },
       { x: 32, y: 16, w: 16, h: 16 },
@@ -141,6 +156,7 @@ const ATLAS = {
       { x: 32, y: 80, w: 16, h: 16 }
     ],
     shadow: [
+      // TODO 6 frames, update positions
       { x: 48, y: 80, w: 16, h: 16 },
       { x: 0, y: 80, w: 16, h: 16 },
       { x: 16, y: 80, w: 16, h: 16 },
@@ -153,13 +169,20 @@ const ATLAS = {
       x: 1, y: 3, w: 14, h: 10
     },
     dying: [
-      { x: 80, y: 0, w: 16, h: 16 },
       { x: 208, y: 0, w: 16, h: 16 },
       { x: 208, y: 16, w: 16, h: 16 },
       { x: 128, y: 32, w: 16, h: 16 },
       { x: 128, y: 48, w: 16, h: 16 }
     ],
     fireCadence: 1.5,
+    hit: [
+      { x: 80, y: 0, w: 16, h: 16 },
+      { x: 80, y: 16, w: 16, h: 16 },
+      { x: 80, y: 32, w: 16, h: 16 },
+      { x: 80, y: 48, w: 16, h: 16 },
+      { x: 80, y: 64, w: 16, h: 16 },
+      { x: 80, y: 80, w: 16, h: 16 }
+    ],
     move: [
       { x: 64, y: 0, w: 16, h: 16 },
       { x: 64, y: 16, w: 16, h: 16 },
@@ -177,15 +200,17 @@ const ATLAS = {
     speed: 15,
   },
   alienBullet: {
+    dying: [],
     hitBox: {
       x: 2, y: 2, w:4, h: 4
     },
-    dying: [
-      { x: 200, y: 0, w: 4, h: 8 },
+    hit: [
+      { x: 200, y: 8, w: 8, h: 8 },
+      { x: 200, y: 8, w: 8, h: 8 }
     ],
     move: [
       { x: 200, y: 0, w: 8, h: 8 },
-      { x: 200, y: 16, w: 8, h: 8 },
+      { x: 200, y: 16, w: 8, h: 8 }
     ],
     speed: 45,
   },
@@ -262,6 +287,10 @@ function startGame() {
   screen = GAME_SCREEN;
 };
 
+function canCollide(entity) {
+  return entity.action === 'move' && entity.hp > 0;
+};
+
 function testAABBCollision(entity1, entity2) {
   return (
     (entity1.collideWith === entity2.collisionGroup
@@ -318,6 +347,7 @@ function createEntity({ action = 'move', type, x = 0, y = 0, ...options }) {
     frame: 0,
     frameTime: 0,
     h: sprite.h,
+    hp: 1,        // default to 1 hit point (killed with 1 bullet)
     moveDown: 0,
     moveLeft: 0,
     moveRight: 0,
@@ -364,10 +394,22 @@ function updateEntityPositionAndAnimationFrame(entity) {
   if (entity.frameTime > FRAME_DURATION) {
     entity.frameTime -= FRAME_DURATION;
     entity.frame += 1;
+
+    if (entity.hp < 1 && entity.action !== 'dying') {
+      entity.action = 'dying';
+      entity.frame = 0;
+    }
+    if (entity.action === 'hit') {
+      // only play 1 frame of the "hit" animation
+      entity.action = 'move';
+    }
     const frameCount = ATLAS[entity.type][entity.action].length;
-    if (entity.action === 'dying' && entity.frame === frameCount) {
-      // dying animation only play once, mark entity for removal at end of loop
+    if (entity.hp < 1 && entity.frame === frameCount) {
+      // only play the "dying" animation once
       entity.dead = true;
+      if (entity.type.match(/alien/)) {
+        score += 10;
+      }
     } else {
       entity.frame %= frameCount;
     }
@@ -465,6 +507,8 @@ function spawnEnemy() {
       collideWith: COLLISION_GROUP_HUMANS,
       // make them fire sooner the first time
       fireTime: 0.4,
+      // alien1 fires less often, so make it tougher
+      hp: type === 'alien1' ? 2 : 1,
       // always move down
       moveY: 1,
       x: viewportOffsetX + rand(0, VIEWPORT.width),
@@ -486,13 +530,13 @@ function update() {
       spawnEnemy();
       entities.forEach(fireBullet);
       entities.forEach((entity1, i) => {
-        if (entity1.action !== 'dying') {
+        if (canCollide(entity1)) {
           entities.slice(i + 1).forEach(entity2 => {
-            if (entity2.action !== 'dying' && testAABBCollision(entity1, entity2)) {
-              entity1.action = entity2.action = 'dying';
-              entity1.frame = entity2.frame = 0;
+            if (canCollide(entity2) && testAABBCollision(entity1, entity2)) {
+              entity1.action = entity2.action = 'hit';
               entity1.frameTime = entity2.frameTime = 0;
-              score += 10;
+              entity1.hp -= 1;
+              entity2.hp -= 1;
             }
           });
         }
@@ -620,6 +664,7 @@ function render() {
   blit();
 };
 
+// rename to shadow
 function renderReflection(entity, ctx = VIEWPORT_CTX) {
   switch(entity.type) {
     case 'hero':
@@ -627,7 +672,7 @@ function renderReflection(entity, ctx = VIEWPORT_CTX) {
       // TODO uncomment once their shadows animated
     // case 'alien1':
     // case 'alien2':
-      if (entity.action !== 'dying' || entity.frame === 0) {
+      if (entity.action !== 'dying') {
         const sprite = ATLAS[entity.type]['shadow'][entity.frame];
         // TODO skip draw if image outside of visible canvas
         ctx.drawImage(
