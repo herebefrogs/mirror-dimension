@@ -399,25 +399,28 @@ function updateEntityPositionAndAnimationFrame(entity) {
     entity.frameTime -= FRAME_DURATION;
     entity.frame += 1;
 
+    // update action
     if (entity.hp < 1 && entity.action !== 'dying') {
       entity.action = 'dying';
+      // start dying animation from 1st frame
       entity.frame = 0;
+      if (entity.type.match(/alien/)) {
+        score += 10;
+      }
     }
     if (entity.action === 'hit') {
       // only play 1 frame of the "hit" animation
       entity.action = 'move';
     }
     const frameCount = ATLAS[entity.type][entity.action].length;
-    if (entity.hp < 1 && entity.frame === frameCount) {
+    if (entity.action === 'dying' && entity.frame === frameCount) {
       // only play the "dying" animation once
       entity.dead = true;
-      if (entity.type.match(/alien/)) {
-        score += 10;
-      }
-    } else {
-      entity.frame %= frameCount;
     }
+
+    entity.frame %= frameCount;
   }
+
   // update position
   const scale = entity.moveX && entity.moveY ? RADIUS_ONE_AT_45_DEG : 1;
   const distance = entity.speed * elapsedTime * scale;
