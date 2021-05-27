@@ -249,6 +249,7 @@ function startGame() {
     type: 'hero',
     collisionGroup: COLLISION_GROUP_HUMANS,
     collideWith: COLLISION_GROUP_ALIENS,
+    shooting: isMobile,
     x: MAP.width / 2,
     y: MAP.height - 3*ATLAS.hero.move[0].h
   });
@@ -258,6 +259,7 @@ function startGame() {
       type: 'wingfolk',
       collisionGroup: COLLISION_GROUP_HUMANS,
       collideWith: COLLISION_GROUP_ALIENS,
+      shooting: isMobile,
       x: hero.x - hero.w,
       y: hero.y + hero.h
     }),
@@ -265,6 +267,7 @@ function startGame() {
       type: 'wingfolk',
       collisionGroup: COLLISION_GROUP_HUMANS,
       collideWith: COLLISION_GROUP_ALIENS,
+      shooting: isMobile,
       x: hero.x + hero.w,
       y: hero.y + hero.h
     }),
@@ -274,6 +277,7 @@ function startGame() {
       type: 'wingfolk',
       collisionGroup: COLLISION_GROUP_HUMANS,
       collideWith: COLLISION_GROUP_ALIENS,
+      shooting: isMobile,
       x: hero.x,
       y: hero.y + 2.25*hero.h
     }));
@@ -421,68 +425,69 @@ function updateEntityPositionAndAnimationFrame(entity) {
   entity.y += distance * entity.moveY;
 };
 
+function aimAtTarget(origin, target) {
+  // shoot in front of the target
+  const targetX = target.x + target.w/2;
+  const targetY = target.y - 2*target.h;
+  const hypotenuse = Math.sqrt(Math.pow(targetX - origin.x, 2) + Math.pow(targetY - origin.y, 2))
+  const adjacent = targetX - origin.x;
+  const opposite = targetY - origin.y;
+  // x = cos(alpha), y = sin(alpha)
+  return [adjacent / hypotenuse, opposite / hypotenuse];
+}
+
 function fireBullet(entity) {
-  if (entity.action !== 'dying') {
+  entity.fireTime += (entity.shooting && entity.action !== 'dying') ? elapsedTime : 0;
+  if (entity.fireTime >= entity.fireCadence) {
+    entity.fireTime -= entity.fireCadence;
+
+    let bullet;
     switch (entity.type) {
       case 'hero':
       case 'wingfolk':
-        entity.fireTime += hero.shooting || isMobile ? elapsedTime : 0;
-        if (entity.fireTime >= entity.fireCadence) {
-          entity.fireTime -= entity.fireCadence;
-          const bullet = createEntity({
-            type: 'shipBullet',
-            collideWith: COLLISION_GROUP_ALIENS,
-            // always move up
-            moveY: -1,
-            x: entity.x + entity.w / 2,
-            y: entity.y - entity.h
-          });
-          // center bullet on the nose of the hero/wingfolk ship
-          bullet.x -= bullet.w / 2;
-
-          // add bullets at the end, so they are drawn on top of other sprites
-          entities.push(bullet);
-        }
+        bullet = createEntity({
+          type: 'shipBullet',
+          collideWith: COLLISION_GROUP_ALIENS,
+          // always move up
+          moveY: -1,
+          x: entity.x + entity.w / 2,
+          y: entity.y - entity.h
+        });
+        // center bullet on the nose of the hero/wingfolk ship
+        bullet.x -= bullet.w / 2;
         break;
       case 'alien1':
       case 'alien2':
-        entity.fireTime += elapsedTime;
-        if (entity.fireTime >= entity.fireCadence) {
-          entity.fireTime -= entity.fireCadence;
-          const bullet = createEntity({
-            type: 'alienBullet',
-            collideWith: COLLISION_GROUP_HUMANS,
-            x: entity.x + entity.w / 2,
-            y: entity.y + entity.h
-          });
-          // center bullet on the nose of the alien ship
-          bullet.x -= bullet.w / 2;
+        bullet = createEntity({
+          type: 'alienBullet',
+          collideWith: COLLISION_GROUP_HUMANS,
+          x: entity.x + entity.w / 2,
+          y: entity.y + entity.h
+        });
+        // center bullet on the nose of the alien ship
+        bullet.x -= bullet.w / 2;
 
-          // shoot in front of the leader
-          const heroX = hero.x + hero.w/2;
-          const heroY = hero.y - 2*hero.h;
-          const hypotenuse = Math.sqrt(Math.pow(heroX - bullet.x, 2) + Math.pow(heroY - bullet.y, 2))
-          const adjacent = heroX - bullet.x;
-          const opposite = heroY - bullet.y;
-          bullet.moveY = opposite / hypotenuse;
-          bullet.moveX = adjacent / hypotenuse;
-
-          // add bullets at the end, so they are drawn on top of other sprites
-          entities.push(bullet);
-        }
+        [bullet.moveX, bullet.moveY] = aimAtTarget(bullet, hero);
         break;
     }
+
+    // add bullets at the end, so they are drawn on top of other sprites
+    // HACK: bullet could be undefined, except in practice
+    // only entities with { shooting: true } will enter the switch
+    entities.push(bullet);
   }
 }
 
 function updateScrolling() {
   const scrolledDistance = ATLAS.scroll.speed.y*elapsedTime;
+
   flight.forEach(ship => ship.y -= scrolledDistance);
   viewportOffsetY -= scrolledDistance;
+
   // infinite scrolling
   if (viewportOffsetY < 0) {
     viewportOffsetY += MAP.height - VIEWPORT.height;
-    // TOOD this is not nice, find a way to remove this hack
+    // TODO resetting the background position should not affect every entity position
     entities.forEach(entity => {
       entity.y += MAP.height - VIEWPORT.height
     });
@@ -511,6 +516,7 @@ function spawnEnemy() {
       hp: type === 'alien1' ? 2 : 1,
       // always move down
       moveY: 1,
+      shooting: true,
       x: viewportOffsetX + rand(0, VIEWPORT.width),
       y: viewportOffsetY
     });
@@ -802,9 +808,11 @@ onkeydown = function(e) {
             hero.moveDown = currentTime;
             break;
           case 'Space':
-            hero.shooting = currentTime;
-            // make each ship fire immediately
-            flight.forEach(ship => { ship.fireTime = ship.fireCadence });
+            flight.forEach(ship => {
+              ship.shooting = currentTime;
+              // make each ship fire immediately
+              ship.fireTime = ship.fireCadence
+            });
             break;
           case 'KeyM':
             invertImage = !invertImage;
@@ -870,7 +878,7 @@ onkeyup = function(e) {
           hero.moveDown = 0;
           break;
         case 'Space':
-          hero.shooting = 0;
+          flight.forEach(ship => { ship.shooting = 0 });
       }
       break;
     case END_SCREEN:

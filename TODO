@@ -39,5 +39,8 @@ tech debt
     (or is it actually this way and would make more sense the other way around?)
     ((math is hard and make my head hurt))
     (((big)))
+    touches:
+      - updateScrolling()
   - swap referential origin to bottom left (big)
+      - moving up should be +1, not -1
 
