@@ -13,7 +13,9 @@
     "start": "npm-run-all -s clean -p dev:*",
     "dev:js": "esbuild src/js/game.js --bundle --format=iife --loader:.webp=dataurl --loader:.png=dataurl --sourcemap --outfile=dist/game.js --watch",
     "dev:serve_watch_html_js": "browser-sync 'dist' 'src' --watch --host 0.0.0.0 --https",
-    "dev:watch_img": "chokidar src/img -d 0 -c 'npm run dev:js'"
+    "dev:watch_img": "chokidar src/img -d 0 -c 'npm run dev:js'",
+    "test:build": "run-s clean test:js dev:serve_watch_html_js",
+    "test:js": "esbuild src/js/game.js --bundle --format=iife --loader:.webp=dataurl --loader:.png=dataurl --sourcemap=inline | terser --config-file scripts/terser.config.js -o dist/game.js --source-map \"content=inline\""
   },
   "license": "MIT",
   "devDependencies": {
