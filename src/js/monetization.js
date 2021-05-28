@@ -7,7 +7,7 @@ let currency = '';
 
 export const isMonetizationEnabled = () => monetizationEnabled;
 
-export const monetizationEarned = () => `${Math.round(paid * 100000) / 100000} ${currency.toLowerCase()}`;
+export const monetizationEarned = () => `${Math.round(paid * 1000000000) / 1000000000} ${currency.toLowerCase()}`;
 
 function disableMonetization() {
   // flag monetization as active

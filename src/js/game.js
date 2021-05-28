@@ -660,11 +660,12 @@ function render() {
       renderText(`${score}`, TEXT.width - CHARSET_SIZE, CHARSET_SIZE, ALIGN_RIGHT);
 
       renderText('game over', TEXT.width / 2, TEXT.height / 2 - 4 * CHARSET_SIZE, ALIGN_CENTER, 2);
-      if (isMonetizationEnabled()) {
-        renderText(`thanks! i earned ${monetizationEarned()}`, TEXT.width / 2, TEXT.height / 2 - CHARSET_SIZE, ALIGN_CENTER);
-      }
       renderText(`${isMobile ? 'tap' : '[enter]'} to restart`, TEXT.width / 2, TEXT.height / 2 + 3*CHARSET_SIZE, ALIGN_CENTER);
       renderText(isMobile ? '' : '[t]weet your score', TEXT.width / 2, TEXT.height / 2 + 4.6*CHARSET_SIZE, ALIGN_CENTER);
+      if (isMonetizationEnabled()) {
+        renderText('coil', CHARSET_SIZE, TEXT.height - 3.6*CHARSET_SIZE);
+        renderText(monetizationEarned(), TEXT.width - CHARSET_SIZE, TEXT.height - 3.6*CHARSET_SIZE, ALIGN_RIGHT);
+      }
       renderText('highscore:', CHARSET_SIZE, TEXT.height - 2*CHARSET_SIZE);
       renderText(`${highscore}`, TEXT.width - CHARSET_SIZE, TEXT.height - 2*CHARSET_SIZE, ALIGN_RIGHT);
       break;
