@@ -407,6 +407,11 @@ function updateEntityPositionAndAnimationFrame(entity) {
       if (entity.type.match(/alien/)) {
         score += 10;
       }
+      if (entity === hero && flight.length > 1 && !hero.announcedPromotion) {
+        // hero is always 1st in flight, so the next ship will be promoted
+        speak(`Red ${flight[1].flightRank} assuming command!`);
+        hero.announcedPromotion = true;
+      }
     }
     if (entity.action === 'hit') {
       // only play 1 frame of the "hit" animation
@@ -587,7 +592,6 @@ function update() {
         newLeader.shooting = hero.shooting;
         // promote the next wingfolk as leader
         hero = newLeader;
-        speak(`Red ${hero.flightRank} assuming command!`);
       }
       break;
   }
@@ -760,7 +764,9 @@ onload = async (e) => {
   await initCharset(TEXT_CTX);
   tileset = await loadImg(TILESET);
   levelset = await loadImg(LEVELSET);
-  speak = await initSpeech();
+
+  texts = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => `Red ${i} assuming command`);
+  speak = await initSpeech(texts);
 
   toggleLoop(true);
 };
