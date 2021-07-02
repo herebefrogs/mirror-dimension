@@ -409,7 +409,7 @@ function updateEntityPositionAndAnimationFrame(entity) {
       }
       if (entity === hero && flight.length > 1 && !hero.announcedPromotion) {
         // hero is always 1st in flight, so the next ship will be promoted
-        speak(`Red ${flight[1].flightRank} assuming command!`);
+        speak(`Red ${flight[1].flightRank} taking point`);
         hero.announcedPromotion = true;
       }
     }
@@ -765,7 +765,7 @@ onload = async (e) => {
   tileset = await loadImg(TILESET);
   levelset = await loadImg(LEVELSET);
 
-  texts = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => `Red ${i} assuming command`);
+  texts = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => `Red ${i} taking point`);
   speak = await initSpeech(texts);
 
   toggleLoop(true);
